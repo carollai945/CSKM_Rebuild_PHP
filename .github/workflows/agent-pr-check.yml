@@ -315,6 +315,9 @@ jobs:
           echo "Installing Composer dependencies..."
           composer install --no-interaction --prefer-dist --optimize-autoloader
 
+          # Generate application key for testing
+          php artisan key:generate --ansi
+
           if [ -f artisan ]; then
             echo "Detected Laravel; running tests with php artisan test."
             php artisan test
