@@ -8,7 +8,7 @@
 - Laravel 11
 - Laravel Sanctum（API 認證）
 - Eloquent ORM
-- PHPUnit / Pest（測試）
+- PHPUnit（測試）
 
 ## 專案結構
 
@@ -50,6 +50,4 @@ php artisan serve
 
 ```bash
 php artisan test
-# 或
-vendor/bin/pest
 ```
