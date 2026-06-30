@@ -315,7 +315,8 @@ jobs:
           echo "Installing Composer dependencies..."
           composer install --no-interaction --prefer-dist --optimize-autoloader
 
-          # Generate application key for testing
+          # Set up environment for testing
+          cp .env.example .env
           php artisan key:generate --ansi
 
           if [ -f artisan ]; then
