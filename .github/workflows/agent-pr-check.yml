@@ -1,0 +1,493 @@
+name: Agent PR Check
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+      - reopened
+      - ready_for_review
+  pull_request_review:
+    types:
+      - submitted
+      - edited
+      - dismissed
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  validate-pr-baseline:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enforce non-empty PR and WIP branch policy
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const pull_number = context.payload.pull_request.number;
+            const title = (context.payload.pull_request.title || "").trim();
+            const baseRef = context.payload.pull_request.base.ref;
+            const isDraft = Boolean(context.payload.pull_request.draft);
+
+            if (!isDraft && baseRef === "main" && title.startsWith("[WIP]")) {
+              core.setFailed("WIP PR cannot target main. Remove [WIP] and complete required checks before merge.");
+              return;
+            }
+
+            const files = await github.paginate(
+              github.rest.pulls.listFiles,
+              { owner, repo, pull_number, per_page: 100 }
+            );
+
+            core.info(`Changed files: ${files.length}`);
+            if (files.length === 0) {
+              if (isDraft || title.startsWith("[WIP]")) {
+                core.warning("Draft/WIP PR has no file changes yet. Skipping non-empty PR enforcement until ready for review.");
+                return;
+              }
+              core.setFailed("PR has no file changes. Please push implementation changes before merge.");
+            }
+
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Trivy filesystem security scan
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          vuln-type: os,library
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          format: table
+          exit-code: '1'
+
+  review-approval-check:
+    if: ${{ github.event.pull_request.draft == false && !startsWith(github.event.pull_request.title, '[WIP]') }}
+    needs:
+      - security-scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require approved code review
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const pull_number = context.payload.pull_request.number;
+            const prAuthor = context.payload.pull_request.user.login;
+
+            const assignableUsers = await github.paginate(
+              github.rest.issues.listAssignees,
+              { owner, repo, per_page: 100 }
+            );
+            const eligibleReviewers = assignableUsers
+              .map((user) => user.login)
+              .filter((login) => login !== prAuthor);
+            const eligibleReviewerSet = new Set(eligibleReviewers);
+
+            core.info(`PR author: ${prAuthor}`);
+            core.info(`Eligible reviewers: ${eligibleReviewers.join(", ") || "(none)"}`);
+
+            if (eligibleReviewers.length === 0) {
+              core.warning("No eligible reviewer found (single-maintainer repository). Skipping approval gate.");
+              return;
+            }
+
+            const reviews = await github.paginate(
+              github.rest.pulls.listReviews,
+              { owner, repo, pull_number, per_page: 100 }
+            );
+
+            const latestByReviewer = new Map();
+            for (const review of reviews) {
+              latestByReviewer.set(review.user.login, review.state);
+            }
+
+            const states = Array.from(latestByReviewer.entries())
+              .filter(([login]) => eligibleReviewerSet.has(login))
+              .map(([, state]) => state);
+            const decisionStates = states.filter((state) =>
+              state === "APPROVED" || state === "CHANGES_REQUESTED"
+            );
+            const approvals = decisionStates.filter((state) => state === "APPROVED").length;
+            const hasChangesRequested = decisionStates.includes("CHANGES_REQUESTED");
+
+            core.info(`Reviewers considered: ${latestByReviewer.size}`);
+            core.info(`Approvals: ${approvals}`);
+            core.info(`Has CHANGES_REQUESTED: ${hasChangesRequested}`);
+            core.info(`Review decisions considered: ${decisionStates.length}`);
+
+            if (decisionStates.length === 0) {
+              core.warning("No approved/changes-requested review yet. Skipping approval gate until a review decision is submitted.");
+              return;
+            }
+
+            if (hasChangesRequested) {
+              core.setFailed("PR has CHANGES_REQUESTED review. Resolve and re-approve before merge.");
+              return;
+            }
+
+            if (approvals < 1) {
+              core.setFailed("At least 1 approved code review is required.");
+              return;
+            }
+
+            core.info("Code review gate passed.");
+
+  validate-pr-body:
+    if: ${{ github.event.pull_request.draft == false && !startsWith(github.event.pull_request.title, '[WIP]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate required PR sections
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          python3 - <<'PY'
+          import os
+          import re
+          import sys
+
+          body = os.getenv("PR_BODY") or ""
+          required_sections = [
+              "## Story ID",
+              "## Task ID",
+              "## Source Documents",
+              "## Scope",
+              "## Out of Scope",
+              "## Done When",
+              "## Tests",
+              "## Notes for Next Agent",
+          ]
+
+          missing = [section for section in required_sections if section not in body]
+          has_linked_issue_section = "## Linked Issue" in body
+          has_issue_reference = bool(
+              re.search(r"(?im)\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s*:?\s*#\d+\b", body)
+              or re.search(r"(?im)\bissue\s*#\d+\b", body)
+          )
+          if not has_linked_issue_section and not has_issue_reference:
+              missing.append("Linked issue reference (## Linked Issue or Issue #123 / Closes #123)")
+
+          if missing:
+              print("PR body is missing required sections:")
+              for section in missing:
+                  print(f"- {section}")
+              sys.exit(1)
+
+          print("PR body includes all required sections.")
+          PY
+
+  validate-doc-chain:
+    if: ${{ github.event.pull_request.draft == false && !startsWith(github.event.pull_request.title, '[WIP]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate required docs and referenced source documents
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          python3 - <<'PY'
+          import os
+          import sys
+          from pathlib import Path
+
+          repo = Path(".")
+          required_paths = [
+              "docs/CSKM_AI_Agent_Development_Guide.md",
+              "docs/CSKM_GitHub_AI_Agent_Workflow.md",
+              "docs/CSKM_Rebuild_Specification_Guide.md",
+              "docs/CSKM_BDD_SDD_TDD_Guide.md",
+              "docs/CSKM_Story_Coverage_Matrix.md",
+              "docs/CSKM_UserStories.md",
+              "docs/api-design/CSKM_API_Design.md",
+              "docs/data-model/CSKM_Data_Model_Design.md",
+              "docs/flow-design/CSKM_Process_State_Design.md",
+          ]
+
+          missing_paths = [path for path in required_paths if not (repo / path).exists()]
+          if missing_paths:
+              print("Missing required documentation files:")
+              for path in missing_paths:
+                  print(f"- {path}")
+              sys.exit(1)
+
+          body = os.getenv("PR_BODY") or ""
+          lines = body.splitlines()
+          in_source_documents = False
+          source_paths = []
+
+          for line in lines:
+              if line.strip() == "## Source Documents":
+                  in_source_documents = True
+                  continue
+              if in_source_documents and line.startswith("## "):
+                  break
+              if in_source_documents:
+                  stripped = line.strip()
+                  if stripped.startswith("- "):
+                      path = stripped[2:].strip().strip("`")
+                      if path:
+                          source_paths.append(path)
+
+          if not source_paths:
+              print("No source document paths were listed in the PR body.")
+              sys.exit(1)
+
+          missing_source_paths = [path for path in source_paths if not (repo / path).exists()]
+          if missing_source_paths:
+              print("PR references source documents that do not exist:")
+              for path in missing_source_paths:
+                  print(f"- {path}")
+              sys.exit(1)
+
+          print("Documentation chain is present and PR source documents exist.")
+          PY
+
+  validate-code-implementation:
+    if: ${{ github.event.pull_request.draft == false && !startsWith(github.event.pull_request.title, '[WIP]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require code changes for non-doc PRs
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const pull_number = context.payload.pull_request.number;
+            const title = context.payload.pull_request.title || "";
+
+            if (title.toLowerCase().startsWith("docs:")) {
+              core.info("docs: PR detected, skipping code implementation check.");
+              return;
+            }
+
+            const files = await github.paginate(
+              github.rest.pulls.listFiles,
+              { owner, repo, pull_number, per_page: 100 }
+            );
+            const codeFiles = files
+              .map((file) => file.filename)
+              .filter((path) => path.startsWith("backend/") || path.startsWith("frontend/"));
+
+            core.info(`Changed files: ${files.length}`);
+            core.info(`Backend/frontend files: ${codeFiles.length}`);
+
+            if (codeFiles.length === 0) {
+              core.setFailed(
+                "This PR does not contain backend/frontend code changes. For feature development, include implementation files or use 'docs:' PR title for documentation-only changes."
+              );
+              return;
+            }
+
+            core.info("Code implementation check passed.");
+
+  backend-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        if: ${{ hashFiles('backend/composer.json') != '' }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, xml, ctype, json, pdo, pdo_mysql, tokenizer, bcmath
+          coverage: none
+
+      - name: Run backend checks
+        run: |
+          set -e
+          if [ ! -f backend/composer.json ]; then
+            echo "No backend/composer.json found; skipping backend checks."
+            exit 0
+          fi
+
+          cd backend
+
+          echo "Installing Composer dependencies..."
+          composer install --no-interaction --prefer-dist --optimize-autoloader
+
+          if [ -f artisan ]; then
+            echo "Detected Laravel; running tests with php artisan test."
+            php artisan test
+          elif [ -f vendor/bin/pest ]; then
+            echo "Running Pest tests."
+            vendor/bin/pest
+          elif [ -f vendor/bin/phpunit ]; then
+            echo "Running PHPUnit tests."
+            vendor/bin/phpunit
+          else
+            echo "No test runner detected; skipping tests."
+          fi
+
+  frontend-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        if: ${{ hashFiles('frontend/package.json') != '' }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: |
+            frontend/package-lock.json
+
+      - name: Run frontend checks
+        run: |
+          set -e
+          if [ ! -f frontend/package.json ]; then
+            echo "No frontend/package.json found; skipping frontend checks."
+            exit 0
+          fi
+
+          cd frontend
+
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
+
+          if npm run | grep -qE '^[[:space:]]+test'; then
+            npm test -- --runInBand
+          else
+            echo "No frontend test script found; skipping tests."
+          fi
+
+          if npm run | grep -qE '^[[:space:]]+build'; then
+            npm run build
+          else
+            echo "No frontend build script found; skipping build."
+          fi
+
+  sync-pr-checklist:
+    if: ${{ always() }}
+    needs:
+      - validate-pr-baseline
+      - security-scan
+      - review-approval-check
+      - validate-pr-body
+      - validate-doc-chain
+      - validate-code-implementation
+      - backend-checks
+      - frontend-checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sync CI checklist in PR body
+        uses: actions/github-script@v7
+        env:
+          RESULT_VALIDATE_PR_BASELINE: ${{ needs.validate-pr-baseline.result }}
+          RESULT_SECURITY_SCAN: ${{ needs.security-scan.result }}
+          RESULT_REVIEW_APPROVAL_CHECK: ${{ needs.review-approval-check.result }}
+          RESULT_VALIDATE_PR_BODY: ${{ needs.validate-pr-body.result }}
+          RESULT_VALIDATE_DOC_CHAIN: ${{ needs.validate-doc-chain.result }}
+          RESULT_VALIDATE_CODE_IMPLEMENTATION: ${{ needs.validate-code-implementation.result }}
+          RESULT_BACKEND_CHECKS: ${{ needs.backend-checks.result }}
+          RESULT_FRONTEND_CHECKS: ${{ needs.frontend-checks.result }}
+        with:
+          script: |
+            if (!context.payload.pull_request) {
+              core.info("No pull request context. Skip checklist sync.");
+              return;
+            }
+
+            const { owner, repo } = context.repo;
+            const pull_number = context.payload.pull_request.number;
+
+            const normalize = (value) => (value && value !== "null" ? value : "skipped");
+            const passed = (result) => ["success", "skipped"].includes(result);
+            const icon = (result) => (passed(result) ? "x" : " ");
+
+            const rows = [
+              ["validate-pr-baseline", normalize(process.env.RESULT_VALIDATE_PR_BASELINE)],
+              ["security-scan", normalize(process.env.RESULT_SECURITY_SCAN)],
+              ["review-approval-check", normalize(process.env.RESULT_REVIEW_APPROVAL_CHECK)],
+              ["validate-pr-body", normalize(process.env.RESULT_VALIDATE_PR_BODY)],
+              ["validate-doc-chain", normalize(process.env.RESULT_VALIDATE_DOC_CHAIN)],
+              ["validate-code-implementation", normalize(process.env.RESULT_VALIDATE_CODE_IMPLEMENTATION)],
+              ["backend-checks", normalize(process.env.RESULT_BACKEND_CHECKS)],
+              ["frontend-checks", normalize(process.env.RESULT_FRONTEND_CHECKS)],
+            ];
+
+            const checklistLines = rows.map(
+              ([name, result]) => `- [${icon(result)}] ${name}: \`${result}\``
+            );
+
+            const syncTaskPrefix = (body, prefix, checked) => {
+              const mark = checked ? "x" : " ";
+              const pattern = new RegExp(`^- \\[[ x]\\] (${prefix}.*)$`, "gm");
+              return body.replace(pattern, `- [${mark}] $1`);
+            };
+
+            const syncTaskByKeywords = (body, keywords, checked) => {
+              const mark = checked ? "x" : " ";
+              const escaped = keywords.map((keyword) => keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+              const pattern = new RegExp(`^- \\[[ x]\\] (.*(?:${escaped.join("|")}).*)$`, "gmi");
+              return body.replace(pattern, `- [${mark}] $1`);
+            };
+
+            const backendDone = normalize(process.env.RESULT_BACKEND_CHECKS) === "success";
+            const frontendDone = normalize(process.env.RESULT_FRONTEND_CHECKS) === "success";
+
+            const start = "<!-- ci-checklist:start -->";
+            const end = "<!-- ci-checklist:end -->";
+            const section = [
+              start,
+              "## CI Checklist（自動更新）",
+              "",
+              ...checklistLines,
+              "",
+              end,
+            ].join("\n");
+
+            const currentBody = context.payload.pull_request.body || "";
+            let nextBodyBase = currentBody;
+            nextBodyBase = syncTaskPrefix(nextBodyBase, "後端：", backendDone);
+            nextBodyBase = syncTaskPrefix(nextBodyBase, "前端：", frontendDone);
+            nextBodyBase = syncTaskPrefix(nextBodyBase, "Backend:", backendDone);
+            nextBodyBase = syncTaskPrefix(nextBodyBase, "Frontend:", frontendDone);
+            nextBodyBase = syncTaskByKeywords(
+              nextBodyBase,
+              ["後端", "Backend", "controller", "service", "repository", "API", "Artisan", "Composer", "Laravel", "PHP"],
+              backendDone
+            );
+            nextBodyBase = syncTaskByKeywords(
+              nextBodyBase,
+              ["前端", "Frontend", "Vue", "router", "頁面"],
+              frontendDone
+            );
+            nextBodyBase = syncTaskByKeywords(
+              nextBodyBase,
+              ["測試", "test", "build", "建置", "驗證", "Pest", "PHPUnit"],
+              backendDone && frontendDone
+            );
+            nextBodyBase = syncTaskByKeywords(
+              nextBodyBase,
+              ["security", "scan", "掃描", "風險", "Trivy"],
+              normalize(process.env.RESULT_SECURITY_SCAN) === "success"
+            );
+
+            const blockRegex = new RegExp(`${start}[\\s\\S]*?${end}`, "m");
+            const nextBody = blockRegex.test(nextBodyBase)
+              ? nextBodyBase.replace(blockRegex, section)
+              : `${nextBodyBase.trimEnd()}\n\n${section}\n`;
+
+            if (nextBody === currentBody) {
+              core.info("Checklist is already up to date.");
+              return;
+            }
+
+            await github.rest.pulls.update({
+              owner,
+              repo,
+              pull_number,
+              body: nextBody,
+            });
+            core.info("PR checklist updated.");

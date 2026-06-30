@@ -1,0 +1,120 @@
+name: AI Agent Task
+description: Create a small, document-driven task for AI Agent delivery.
+title: "[Task] "
+labels:
+  - agent-ready
+body:
+  - type: input
+    id: story_id
+    attributes:
+      label: Story ID
+      description: Match the story identifier defined in the documentation.
+      placeholder: A04-1
+    validations:
+      required: true
+
+  - type: input
+    id: task_id
+    attributes:
+      label: Task ID
+      description: Use a stable, slice-sized task name.
+      placeholder: A04-submit-form
+    validations:
+      required: true
+
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: Describe the expected business outcome in 1-3 short paragraphs.
+      placeholder: Complete leave request draft save and submit flow.
+    validations:
+      required: true
+
+  - type: textarea
+    id: in_scope
+    attributes:
+      label: In Scope
+      description: List only the page, API, state transition, or module slice to implement.
+      placeholder: |
+        - Leave request detail page
+        - POST /api/v1/applications/leave-requests
+        - POST /api/v1/applications/leave-requests/{id}:submit
+    validations:
+      required: true
+
+  - type: textarea
+    id: out_of_scope
+    attributes:
+      label: Out of Scope
+      description: Explicitly exclude nearby features to keep the slice small.
+      placeholder: |
+        - Approval page
+        - Notification center
+        - Attachment upload
+    validations:
+      required: true
+
+  - type: textarea
+    id: source_documents
+    attributes:
+      label: Source Documents
+      description: Reference the exact BDD, Page Design, SDD, TDD, API, and Flow-State files.
+      placeholder: |
+        - docs/bdd/a04-petition.feature
+        - docs/page-design/a03-leave-request-page-design.md
+        - docs/sdd/a04-petition-sdd.md
+        - docs/tdd/a04-petition-test-design.md
+        - docs/api-design/CSKM_API_Design.md
+        - docs/flow-design/CSKM_Process_State_Design.md
+    validations:
+      required: true
+
+  - type: textarea
+    id: done_when
+    attributes:
+      label: Done When
+      description: Provide observable acceptance criteria that can be checked in the PR.
+      placeholder: |
+        - User can save a draft
+        - User can submit for approval
+        - Validation errors are shown correctly
+        - Status changes from DRAFT to SUBMITTED
+        - Related tests are updated
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: definition_of_ready
+    attributes:
+      label: Definition of Ready
+      description: Check every item before assigning this issue to an AI Agent.
+      options:
+        - label: Story ID is defined and stable
+          required: true
+        - label: Matching BDD exists
+          required: true
+        - label: Matching Page Design exists
+          required: true
+        - label: Matching SDD exists
+          required: true
+        - label: Matching TDD exists
+          required: true
+        - label: API or Flow-State rules needed by this slice are documented
+          required: true
+        - label: Scope is small enough for a single PR
+          required: true
+
+  - type: dropdown
+    id: work_area
+    attributes:
+      label: Primary Work Area
+      options:
+        - frontend
+        - backend
+        - api
+        - flow
+        - docs
+        - full-slice
+    validations:
+      required: true

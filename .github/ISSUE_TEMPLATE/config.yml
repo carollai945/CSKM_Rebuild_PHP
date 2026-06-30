@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: CSKM AI Agent Development Guide
+    url: https://github.com/carollai945/CSKM
+    about: Follow the repository documentation chain and task slicing rules before opening new work.
