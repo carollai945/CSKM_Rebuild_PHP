@@ -309,6 +309,9 @@ jobs:
 
           cd backend
 
+          # Ensure required Laravel runtime directories exist
+          mkdir -p bootstrap/cache storage/framework/{sessions,views,cache} storage/logs
+
           echo "Installing Composer dependencies..."
           composer install --no-interaction --prefer-dist --optimize-autoloader
 
