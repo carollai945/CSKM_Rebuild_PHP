@@ -6,6 +6,7 @@ use App\Http\Controllers\Academic\SubjectController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\ClassroomController;
 use App\Http\Controllers\HealthController;
+use App\Http\Controllers\InterviewController;
 use App\Http\Controllers\LeadController;
 use App\Http\Controllers\Master\DepartmentController;
 use App\Http\Controllers\Master\TitleController;
@@ -98,5 +99,11 @@ Route::prefix('v1')->group(function () {
         Route::post('/leads', [LeadController::class, 'store']);
         Route::put('/leads/{lead}', [LeadController::class, 'update']);
         Route::delete('/leads/{lead}', [LeadController::class, 'destroy']);
+
+        Route::get('/interviews', [InterviewController::class, 'index']);
+        Route::get('/interviews/{interview}', [InterviewController::class, 'show']);
+        Route::post('/interviews', [InterviewController::class, 'store']);
+        Route::put('/interviews/{interview}', [InterviewController::class, 'update']);
+        Route::delete('/interviews/{interview}', [InterviewController::class, 'destroy']);
     });
 });
