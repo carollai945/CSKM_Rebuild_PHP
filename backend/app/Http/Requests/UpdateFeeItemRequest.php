@@ -11,7 +11,7 @@ class UpdateFeeItemRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'item_code'  => 'sometimes|required|string|max:50|unique:fee_items,item_code,' . $this->route('fee_item')->id,
+            'item_code'  => 'sometimes|required|string|max:50|unique:fee_items,item_code,' . ($this->route('feeItem')?->id ?? 'NULL'),
             'item_name'  => 'sometimes|required|string|max:200',
             'amount'     => 'sometimes|required|numeric|min:0',
             'currency'   => 'nullable|string|max:10',
