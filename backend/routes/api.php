@@ -6,6 +6,7 @@ use App\Http\Controllers\Academic\SubjectController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\ClassroomController;
 use App\Http\Controllers\HealthController;
+use App\Http\Controllers\LeadController;
 use App\Http\Controllers\Master\DepartmentController;
 use App\Http\Controllers\Master\TitleController;
 use App\Http\Controllers\ProfessorController;
@@ -91,5 +92,11 @@ Route::prefix('v1')->group(function () {
             Route::delete('/professors/{professor}', [ProfessorController::class, 'destroy']);
             Route::delete('/professors/{professor}/files/{file}', [ProfessorController::class, 'destroyFile']);
         });
+
+        Route::get('/leads', [LeadController::class, 'index']);
+        Route::post('/leads/assign', [LeadController::class, 'assign']);
+        Route::post('/leads', [LeadController::class, 'store']);
+        Route::put('/leads/{lead}', [LeadController::class, 'update']);
+        Route::delete('/leads/{lead}', [LeadController::class, 'destroy']);
     });
 });
