@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\HealthController;
+use App\Http\Controllers\Master\DepartmentController;
+use App\Http\Controllers\Master\TitleController;
 use App\Http\Controllers\RegionController;
 use Illuminate\Support\Facades\Route;
 
@@ -29,9 +31,8 @@ Route::prefix('v1')->group(function () {
             Route::put('/regions/{region}', [RegionController::class, 'update']);
             Route::delete('/regions/{region}', [RegionController::class, 'destroy']);
         });
-    });
-});
 
-Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
-    Route::get('/admin/ping', fn () => response()->json(['status' => 'ok']));
+        Route::apiResource('departments', DepartmentController::class)->only(['index', 'store', 'update', 'destroy']);
+        Route::apiResource('titles', TitleController::class)->only(['index', 'store', 'update', 'destroy']);
+    });
 });
