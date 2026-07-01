@@ -10,6 +10,7 @@ use App\Http\Controllers\InterviewController;
 use App\Http\Controllers\LeadController;
 use App\Http\Controllers\Master\DepartmentController;
 use App\Http\Controllers\Master\TitleController;
+use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\ProfessorController;
 use App\Http\Controllers\RegionController;
 use App\Http\Controllers\StaffController;
@@ -45,6 +46,8 @@ Route::prefix('v1')->group(function () {
     });
 
     Route::middleware('auth:sanctum')->group(function () {
+        Route::post('/me/change-password', [PasswordController::class, 'change']);
+
         Route::get('/classrooms', [ClassroomController::class, 'index']);
         Route::middleware('role:admin,ceo')->group(function () {
             Route::post('/classrooms', [ClassroomController::class, 'store']);
