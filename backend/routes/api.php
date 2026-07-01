@@ -15,6 +15,7 @@ use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\ProfessorController;
 use App\Http\Controllers\RegionController;
 use App\Http\Controllers\StaffController;
+use App\Http\Controllers\StudentController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/health', [HealthController::class, 'check']);
@@ -114,5 +115,15 @@ Route::prefix('v1')->group(function () {
             Route::put('/fee-items/{feeItem}', [FeeItemController::class, 'update']);
             Route::delete('/fee-items/{feeItem}', [FeeItemController::class, 'destroy']);
         });
+    });
+});
+
+        Route::get('/students', [StudentController::class, 'index']);
+        Route::post('/students', [StudentController::class, 'store']);
+        Route::get('/students/{student}', [StudentController::class, 'show']);
+        Route::put('/students/{student}', [StudentController::class, 'update']);
+        Route::patch('/students/{student}/advisor', [StudentController::class, 'updateAdvisor']);
+        Route::get('/students/{student}/courses', [StudentController::class, 'getCourses']);
+        Route::put('/students/{student}/courses', [StudentController::class, 'updateCourses']);
     });
 });
