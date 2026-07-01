@@ -8,6 +8,7 @@ use App\Http\Controllers\ClassroomController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\Master\DepartmentController;
 use App\Http\Controllers\Master\TitleController;
+use App\Http\Controllers\ProfessorController;
 use App\Http\Controllers\RegionController;
 use App\Http\Controllers\StaffController;
 use Illuminate\Support\Facades\Route;
@@ -80,6 +81,15 @@ Route::prefix('v1')->group(function () {
             Route::post('/subjects', [SubjectController::class, 'store']);
             Route::put('/subjects/{subject}', [SubjectController::class, 'update']);
             Route::delete('/subjects/{subject}', [SubjectController::class, 'destroy']);
+        });
+
+        Route::get('/professors', [ProfessorController::class, 'index']);
+        Route::get('/professors/{professor}', [ProfessorController::class, 'show']);
+        Route::middleware('role:admin,ceo')->group(function () {
+            Route::post('/professors', [ProfessorController::class, 'store']);
+            Route::put('/professors/{professor}', [ProfessorController::class, 'update']);
+            Route::delete('/professors/{professor}', [ProfessorController::class, 'destroy']);
+            Route::delete('/professors/{professor}/files/{file}', [ProfessorController::class, 'destroyFile']);
         });
     });
 });
