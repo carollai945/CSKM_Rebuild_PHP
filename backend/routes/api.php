@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\ClassroomController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\Master\DepartmentController;
 use App\Http\Controllers\Master\TitleController;
@@ -34,5 +35,15 @@ Route::prefix('v1')->group(function () {
 
         Route::apiResource('departments', DepartmentController::class)->only(['index', 'store', 'update', 'destroy']);
         Route::apiResource('titles', TitleController::class)->only(['index', 'store', 'update', 'destroy']);
+    });
+
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/classrooms', [ClassroomController::class, 'index']);
+
+        Route::middleware('role:admin,ceo')->group(function () {
+            Route::post('/classrooms', [ClassroomController::class, 'store']);
+            Route::put('/classrooms/{classroom}', [ClassroomController::class, 'update']);
+            Route::delete('/classrooms/{classroom}', [ClassroomController::class, 'destroy']);
+        });
     });
 });
