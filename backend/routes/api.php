@@ -17,6 +17,7 @@ use App\Http\Controllers\ProfessorController;
 use App\Http\Controllers\RegionController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\StudentServiceController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/health', [HealthController::class, 'check']);
@@ -130,5 +131,11 @@ Route::prefix('v1')->group(function () {
         Route::patch('/students/{student}/advisor', [StudentController::class, 'updateAdvisor']);
         Route::get('/students/{student}/courses', [StudentController::class, 'getCourses']);
         Route::put('/students/{student}/courses', [StudentController::class, 'updateCourses']);
+
+        Route::get('/student-services', [StudentServiceController::class, 'index']);
+        Route::post('/student-services', [StudentServiceController::class, 'store']);
+        Route::get('/student-services/{studentService}', [StudentServiceController::class, 'show']);
+        Route::put('/student-services/{studentService}', [StudentServiceController::class, 'update']);
+        Route::delete('/student-services/{studentService}', [StudentServiceController::class, 'destroy']);
     });
 });
