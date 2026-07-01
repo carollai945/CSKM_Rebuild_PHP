@@ -94,4 +94,33 @@ class StaffController extends Controller
             'status' => $staff->status,
         ];
     }
+
+    public function overview(Request $request): JsonResponse
+    {
+        $staff = Staff::with(['region', 'department', 'title'])
+            ->when($request->filled('region_id'), fn (Builder $q) => $q->where('region_id', $request->region_id))
+            ->when($request->filled('department_id'), fn (Builder $q) => $q->where('department_id', $request->department_id))
+            ->when($request->filled('title_id'), fn (Builder $q) => $q->where('title_id', $request->title_id))
+            ->when($request->filled('status'), fn (Builder $q) => $q->where('status', $request->status))
+            ->when($request->filled('keyword'), function (Builder $q) use ($request): void {
+                $kw = '%' . $request->string('keyword')->trim()->value() . '%';
+                $q->where(fn (Builder $sq) => $sq->where('name', 'like', $kw)->orWhere('staff_no', 'like', $kw));
+            })
+            ->orderBy('staff_no')
+            ->get();
+
+        return response()->json([
+            'data' => $staff->map(fn (Staff $member) => [
+                'id'            => $member->id,
+                'staff_no'      => $member->staff_no,
+                'name'          => $member->name,
+                'region'        => $member->region?->only(['id', 'name']),
+                'department'    => $member->department?->only(['id', 'name']),
+                'title'         => $member->title?->only(['id', 'name']),
+                'join_date'     => $member->join_date?->toDateString(),
+                'leave_date'    => $member->leave_date?->toDateString(),
+                'status'        => $member->status,
+            ])->all(),
+        ]);
+    }
 }
