@@ -5,6 +5,7 @@ use App\Http\Controllers\Academic\InstituteController;
 use App\Http\Controllers\Academic\SubjectController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\ClassroomController;
+use App\Http\Controllers\FeeItemController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\InterviewController;
 use App\Http\Controllers\LeadController;
@@ -24,7 +25,6 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
 Route::prefix('v1')->group(function () {
     Route::prefix('auth')->group(function () {
         Route::post('/login', [AuthController::class, 'login']);
-
         Route::middleware('auth:sanctum')->group(function () {
             Route::post('/logout', [AuthController::class, 'logout']);
             Route::get('/me', [AuthController::class, 'me']);
@@ -33,13 +33,11 @@ Route::prefix('v1')->group(function () {
 
     Route::prefix('master')->group(function () {
         Route::get('/regions', [RegionController::class, 'index']);
-
         Route::middleware(['auth:sanctum', 'role:admin,ceo'])->group(function () {
             Route::post('/regions', [RegionController::class, 'store']);
             Route::put('/regions/{region}', [RegionController::class, 'update']);
             Route::delete('/regions/{region}', [RegionController::class, 'destroy']);
         });
-
         Route::apiResource('departments', DepartmentController::class)->only(['index', 'store', 'update', 'destroy']);
         Route::apiResource('titles', TitleController::class)->only(['index', 'store', 'update', 'destroy']);
     });
@@ -105,5 +103,12 @@ Route::prefix('v1')->group(function () {
         Route::post('/interviews', [InterviewController::class, 'store']);
         Route::put('/interviews/{interview}', [InterviewController::class, 'update']);
         Route::delete('/interviews/{interview}', [InterviewController::class, 'destroy']);
+
+        Route::get('/fee-items', [FeeItemController::class, 'index']);
+        Route::middleware('role:admin,ceo')->group(function () {
+            Route::post('/fee-items', [FeeItemController::class, 'store']);
+            Route::put('/fee-items/{feeItem}', [FeeItemController::class, 'update']);
+            Route::delete('/fee-items/{feeItem}', [FeeItemController::class, 'destroy']);
+        });
     });
 });
