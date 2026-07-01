@@ -12,6 +12,7 @@ use App\Http\Controllers\LeadController;
 use App\Http\Controllers\Master\DepartmentController;
 use App\Http\Controllers\Master\TitleController;
 use App\Http\Controllers\PasswordController;
+use App\Http\Controllers\PersonalDataController;
 use App\Http\Controllers\ProfessorController;
 use App\Http\Controllers\RegionController;
 use App\Http\Controllers\StaffController;
@@ -49,6 +50,8 @@ Route::prefix('v1')->group(function () {
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/me/change-password', [PasswordController::class, 'change']);
+        Route::get('/me/personal-data', [PersonalDataController::class, 'show']);
+        Route::put('/me/personal-data', [PersonalDataController::class, 'update']);
 
         Route::get('/classrooms', [ClassroomController::class, 'index']);
         Route::middleware('role:admin,ceo')->group(function () {
@@ -60,6 +63,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/staff/autocomplete', [StaffController::class, 'autocomplete']);
         Route::get('/staff/overview', [StaffController::class, 'overview']);
         Route::get('/staff', [StaffController::class, 'index']);
+        Route::get('/staff/{staff}/personal-data', [PersonalDataController::class, 'showByStaffId']);
         Route::get('/staff/{staff}', [StaffController::class, 'show']);
         Route::middleware('role:admin')->group(function () {
             Route::post('/staff', [StaffController::class, 'store']);

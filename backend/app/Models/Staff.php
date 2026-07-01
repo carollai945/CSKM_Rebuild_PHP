@@ -23,13 +23,19 @@ class Staff extends Model
         'join_date',
         'leave_date',
         'status',
+        'phone',
+        'gender',
+        'blood_type',
+        'birth_date',
+        'photo_url',
     ];
 
     protected function casts(): array
     {
         return [
-            'join_date' => 'date:Y-m-d',
+            'join_date'  => 'date:Y-m-d',
             'leave_date' => 'date:Y-m-d',
+            'birth_date' => 'date:Y-m-d',
         ];
     }
 
