@@ -58,30 +58,28 @@ Route::prefix('v1')->group(function () {
             Route::patch('/staff/{staff}/status', [StaffController::class, 'updateStatus']);
         });
 
-        Route::prefix('academic')->group(function () {
-            Route::get('/institutes', [InstituteController::class, 'index']);
-            Route::get('/institutes/{institute}', [InstituteController::class, 'show']);
-            Route::middleware('role:admin,ceo')->group(function () {
-                Route::post('/institutes', [InstituteController::class, 'store']);
-                Route::put('/institutes/{institute}', [InstituteController::class, 'update']);
-                Route::delete('/institutes/{institute}', [InstituteController::class, 'destroy']);
-            });
+        Route::get('/institutes', [InstituteController::class, 'index']);
+        Route::get('/institutes/{institute}', [InstituteController::class, 'show']);
+        Route::middleware('role:admin,ceo')->group(function () {
+            Route::post('/institutes', [InstituteController::class, 'store']);
+            Route::put('/institutes/{institute}', [InstituteController::class, 'update']);
+            Route::delete('/institutes/{institute}', [InstituteController::class, 'destroy']);
+        });
 
-            Route::get('/courses', [CourseController::class, 'index']);
-            Route::get('/courses/{course}', [CourseController::class, 'show']);
-            Route::middleware('role:admin,ceo')->group(function () {
-                Route::post('/courses', [CourseController::class, 'store']);
-                Route::put('/courses/{course}', [CourseController::class, 'update']);
-                Route::delete('/courses/{course}', [CourseController::class, 'destroy']);
-            });
+        Route::get('/courses', [CourseController::class, 'index']);
+        Route::get('/courses/{course}', [CourseController::class, 'show']);
+        Route::middleware('role:admin,ceo')->group(function () {
+            Route::post('/courses', [CourseController::class, 'store']);
+            Route::put('/courses/{course}', [CourseController::class, 'update']);
+            Route::delete('/courses/{course}', [CourseController::class, 'destroy']);
+        });
 
-            Route::get('/subjects', [SubjectController::class, 'index']);
-            Route::get('/subjects/{subject}', [SubjectController::class, 'show']);
-            Route::middleware('role:admin,ceo')->group(function () {
-                Route::post('/subjects', [SubjectController::class, 'store']);
-                Route::put('/subjects/{subject}', [SubjectController::class, 'update']);
-                Route::delete('/subjects/{subject}', [SubjectController::class, 'destroy']);
-            });
+        Route::get('/subjects', [SubjectController::class, 'index']);
+        Route::get('/subjects/{subject}', [SubjectController::class, 'show']);
+        Route::middleware('role:admin,ceo')->group(function () {
+            Route::post('/subjects', [SubjectController::class, 'store']);
+            Route::put('/subjects/{subject}', [SubjectController::class, 'update']);
+            Route::delete('/subjects/{subject}', [SubjectController::class, 'destroy']);
         });
     });
 });
