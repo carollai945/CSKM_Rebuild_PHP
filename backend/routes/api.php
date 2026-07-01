@@ -16,3 +16,7 @@ Route::prefix('v1')->group(function () {
         });
     });
 });
+
+Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
+    Route::get('/admin/ping', fn () => response()->json(['status' => 'ok']));
+});
