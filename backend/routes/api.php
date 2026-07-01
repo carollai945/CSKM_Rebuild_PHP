@@ -15,6 +15,7 @@ use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\ProfessorController;
 use App\Http\Controllers\RegionController;
 use App\Http\Controllers\StaffController;
+use App\Http\Controllers\StudentController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/health', [HealthController::class, 'check']);
@@ -26,6 +27,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
 Route::prefix('v1')->group(function () {
     Route::prefix('auth')->group(function () {
         Route::post('/login', [AuthController::class, 'login']);
+
         Route::middleware('auth:sanctum')->group(function () {
             Route::post('/logout', [AuthController::class, 'logout']);
             Route::get('/me', [AuthController::class, 'me']);
@@ -34,11 +36,13 @@ Route::prefix('v1')->group(function () {
 
     Route::prefix('master')->group(function () {
         Route::get('/regions', [RegionController::class, 'index']);
+
         Route::middleware(['auth:sanctum', 'role:admin,ceo'])->group(function () {
             Route::post('/regions', [RegionController::class, 'store']);
             Route::put('/regions/{region}', [RegionController::class, 'update']);
             Route::delete('/regions/{region}', [RegionController::class, 'destroy']);
         });
+
         Route::apiResource('departments', DepartmentController::class)->only(['index', 'store', 'update', 'destroy']);
         Route::apiResource('titles', TitleController::class)->only(['index', 'store', 'update', 'destroy']);
     });
@@ -114,5 +118,13 @@ Route::prefix('v1')->group(function () {
             Route::put('/fee-items/{feeItem}', [FeeItemController::class, 'update']);
             Route::delete('/fee-items/{feeItem}', [FeeItemController::class, 'destroy']);
         });
+
+        Route::get('/students', [StudentController::class, 'index']);
+        Route::post('/students', [StudentController::class, 'store']);
+        Route::get('/students/{student}', [StudentController::class, 'show']);
+        Route::put('/students/{student}', [StudentController::class, 'update']);
+        Route::patch('/students/{student}/advisor', [StudentController::class, 'updateAdvisor']);
+        Route::get('/students/{student}/courses', [StudentController::class, 'getCourses']);
+        Route::put('/students/{student}/courses', [StudentController::class, 'updateCourses']);
     });
 });
