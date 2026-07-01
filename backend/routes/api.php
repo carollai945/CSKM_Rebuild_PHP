@@ -6,6 +6,7 @@ use App\Http\Controllers\HealthController;
 use App\Http\Controllers\Master\DepartmentController;
 use App\Http\Controllers\Master\TitleController;
 use App\Http\Controllers\RegionController;
+use App\Http\Controllers\StaffController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/health', [HealthController::class, 'check']);
@@ -39,11 +40,19 @@ Route::prefix('v1')->group(function () {
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/classrooms', [ClassroomController::class, 'index']);
-
         Route::middleware('role:admin,ceo')->group(function () {
             Route::post('/classrooms', [ClassroomController::class, 'store']);
             Route::put('/classrooms/{classroom}', [ClassroomController::class, 'update']);
             Route::delete('/classrooms/{classroom}', [ClassroomController::class, 'destroy']);
+        });
+
+        Route::get('/staff/autocomplete', [StaffController::class, 'autocomplete']);
+        Route::get('/staff', [StaffController::class, 'index']);
+        Route::get('/staff/{staff}', [StaffController::class, 'show']);
+        Route::middleware('role:admin')->group(function () {
+            Route::post('/staff', [StaffController::class, 'store']);
+            Route::put('/staff/{staff}', [StaffController::class, 'update']);
+            Route::patch('/staff/{staff}/status', [StaffController::class, 'updateStatus']);
         });
     });
 });
