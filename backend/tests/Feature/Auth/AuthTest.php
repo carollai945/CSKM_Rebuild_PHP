@@ -53,6 +53,9 @@ class AuthTest extends TestCase
         $response->assertStatus(200)
                  ->assertJson(['message' => 'Logged out successfully.']);
 
+        // Reset the auth guard cache so the next request re-resolves from DB
+        $this->app['auth']->forgetGuards();
+
         // Token should be revoked; subsequent request should return 401
         $this->withToken($token)
              ->getJson('/api/v1/auth/me')
