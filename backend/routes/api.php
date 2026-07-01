@@ -56,6 +56,7 @@ Route::prefix('v1')->group(function () {
         });
 
         Route::get('/staff/autocomplete', [StaffController::class, 'autocomplete']);
+        Route::get('/staff/overview', [StaffController::class, 'overview']);
         Route::get('/staff', [StaffController::class, 'index']);
         Route::get('/staff/{staff}', [StaffController::class, 'show']);
         Route::middleware('role:admin')->group(function () {
