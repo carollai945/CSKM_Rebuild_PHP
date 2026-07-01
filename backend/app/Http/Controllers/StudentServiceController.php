@@ -30,7 +30,7 @@ class StudentServiceController extends Controller
             'service_date' => 'nullable|date',
         ]);
 
-        $validated['staff_id'] = $request->user()->id;
+        $validated['staff_id'] = \App\Models\Staff::where('user_id', $request->user()->id)->value('id');
         $service = StudentService::create($validated);
 
         return response()->json(['data' => $service], 201);

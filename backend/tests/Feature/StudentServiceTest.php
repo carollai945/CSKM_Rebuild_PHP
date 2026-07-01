@@ -16,12 +16,14 @@ class StudentServiceTest extends TestCase
     use RefreshDatabase;
 
     private User $user;
+    private Staff $staff;
     private Student $student;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->user = User::factory()->create(['role' => Role::Admin]);
+        $this->staff = Staff::factory()->create(['user_id' => $this->user->id]);
         $this->student = Student::factory()->create();
     }
 
@@ -29,6 +31,7 @@ class StudentServiceTest extends TestCase
     {
         StudentService::create([
             'student_id'   => $this->student->id,
+            'staff_id'     => $this->staff->id,
             'service_type' => 'CALL',
             'content'      => 'Test',
             'status'       => 'OPEN',
@@ -44,8 +47,8 @@ class StudentServiceTest extends TestCase
     public function test_can_filter_by_student(): void
     {
         $other = Student::factory()->create();
-        StudentService::create(['student_id' => $this->student->id, 'service_type' => 'CALL', 'status' => 'OPEN']);
-        StudentService::create(['student_id' => $other->id, 'service_type' => 'CALL', 'status' => 'OPEN']);
+        StudentService::create(['student_id' => $this->student->id, 'staff_id' => $this->staff->id, 'service_type' => 'CALL', 'status' => 'OPEN']);
+        StudentService::create(['student_id' => $other->id, 'staff_id' => $this->staff->id, 'service_type' => 'CALL', 'status' => 'OPEN']);
 
         Sanctum::actingAs($this->user);
         $response = $this->getJson("/api/v1/student-services?student_id={$this->student->id}");
@@ -73,6 +76,7 @@ class StudentServiceTest extends TestCase
     {
         $service = StudentService::create([
             'student_id'   => $this->student->id,
+            'staff_id'     => $this->staff->id,
             'service_type' => 'CALL',
             'status'       => 'OPEN',
         ]);
@@ -87,6 +91,7 @@ class StudentServiceTest extends TestCase
     {
         $service = StudentService::create([
             'student_id'   => $this->student->id,
+            'staff_id'     => $this->staff->id,
             'service_type' => 'CALL',
             'status'       => 'OPEN',
         ]);
