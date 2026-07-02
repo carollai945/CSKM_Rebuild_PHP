@@ -54,6 +54,7 @@ const router = createRouter({
         { path: 'master/departments', name: 'departments', component: () => import('@/views/DepartmentView.vue') },
         // System
         { path: 'system/backup', name: 'system-backup', component: () => import('@/views/SystemBackupView.vue') },
+        { path: 'staff/:id/permissions', name: 'staff-permissions', component: () => import('@/views/StaffPermissionView.vue') },
       ],
     },
     { path: '/:pathMatch(.*)*', redirect: '/' },

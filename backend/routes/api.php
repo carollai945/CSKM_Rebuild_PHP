@@ -87,6 +87,9 @@ Route::prefix('v1')->group(function () {
             Route::put('/staff/{staff}', [StaffController::class, 'update']);
             Route::patch('/staff/{staff}/status', [StaffController::class, 'updateStatus']);
         });
+        Route::get('/permission-groups', [\App\Http\Controllers\StaffPermissionController::class, 'index']);
+        Route::get('/staff/{staff}/permissions', [\App\Http\Controllers\StaffPermissionController::class, 'show']);
+        Route::put('/staff/{staff}/permissions', [\App\Http\Controllers\StaffPermissionController::class, 'update']);
 
         Route::get('/institutes', [InstituteController::class, 'index']);
         Route::get('/institutes/{institute}', [InstituteController::class, 'show']);
