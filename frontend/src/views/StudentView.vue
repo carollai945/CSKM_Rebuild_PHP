@@ -43,6 +43,7 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { RouterLink } from 'vue-router'
 import { studentsApi } from '@/api/students'
 const rows = ref<Record<string,unknown>[]>([])
 const loading = ref(false)
