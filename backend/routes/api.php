@@ -33,6 +33,7 @@ use App\Http\Controllers\ReportApprovalController;
 use App\Http\Controllers\ReimbursementController;
 use App\Http\Controllers\IncomeReportController;
 use App\Http\Controllers\SystemBackupController;
+use App\Http\Controllers\LeadImportController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/health', [HealthController::class, 'check']);
@@ -118,6 +119,7 @@ Route::prefix('v1')->group(function () {
 
         Route::get('/leads', [LeadController::class, 'index']);
         Route::post('/leads/assign', [LeadController::class, 'assign']);
+        Route::post('/leads/import', [LeadImportController::class, 'import']);
         Route::post('/leads', [LeadController::class, 'store']);
         Route::put('/leads/{lead}', [LeadController::class, 'update']);
         Route::delete('/leads/{lead}', [LeadController::class, 'destroy']);
