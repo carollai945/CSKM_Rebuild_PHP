@@ -62,3 +62,26 @@ class PersonalDataController extends Controller
         return response()->json(['data' => $this->formatStaff($staff, 'READONLY', [])]);
     }
 }
+
+    public function uploadPhoto(Request $request): JsonResponse
+    {
+        $request->validate([
+            'photo' => 'required|image|mimes:jpeg,png,gif|max:2048',
+        ]);
+
+        $staff = Staff::where('user_id', $request->user()->id)->firstOrFail();
+
+        $file = $request->file('photo');
+        $filename = 'staff_' . $staff->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+        $path = $file->storeAs('photos', $filename, 'public');
+        $photoUrl = '/storage/' . $path;
+
+        $staff->update(['photo_url' => $photoUrl]);
+
+        return response()->json([
+            'data' => [
+                'photo_url' => $photoUrl,
+            ],
+        ]);
+    }
+}
