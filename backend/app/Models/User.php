@@ -24,6 +24,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'allowed_modules',
     ];
 
     /**
@@ -44,6 +45,7 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
+            'allowed_modules' => 'array',
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'role' => Role::class,

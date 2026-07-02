@@ -40,6 +40,7 @@
         <div class="nav-group">人員</div>
         <RouterLink to="/staff">👥 人員管理</RouterLink>
         <RouterLink to="/staff/list">📄 人員列表</RouterLink>
+        <RouterLink to="/staff">🔐 權限管理</RouterLink>
         <div class="nav-group">基本設定</div>
         <RouterLink to="/master/regions">🌏 區域管理</RouterLink>
         <RouterLink to="/master/departments">🏢 部門職稱</RouterLink>
