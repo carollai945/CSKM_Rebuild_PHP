@@ -31,6 +31,7 @@ use App\Http\Controllers\PetitionApprovalController;
 use App\Http\Controllers\AnnouncementApprovalController;
 use App\Http\Controllers\ReportApprovalController;
 use App\Http\Controllers\ReimbursementController;
+use App\Http\Controllers\IncomeReportController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/health', [HealthController::class, 'check']);
@@ -151,6 +152,7 @@ Route::prefix('v1')->group(function () {
 
         Route::get('/reports', [ReportController::class, 'index']);
         Route::post('/reports', [ReportController::class, 'store']);
+        Route::get('/reports/income', [IncomeReportController::class, 'index']);
         Route::get('/reports/{report}', [ReportController::class, 'show']);
         Route::put('/reports/{report}', [ReportController::class, 'update']);
         Route::post('/reports/{report}/submit', [ReportController::class, 'submit']);
