@@ -22,6 +22,7 @@ use App\Http\Controllers\LeaveRequestController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PetitionController;
 use App\Http\Controllers\InvoiceRequestController;
+use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\StudentServiceController;
 use Illuminate\Support\Facades\Route;
 
@@ -163,6 +164,12 @@ Route::prefix('v1')->group(function () {
             Route::get('/invoice-requests/{invoiceRequest}', [InvoiceRequestController::class, 'show']);
             Route::put('/invoice-requests/{invoiceRequest}', [InvoiceRequestController::class, 'update']);
             Route::delete('/invoice-requests/{invoiceRequest}', [InvoiceRequestController::class, 'destroy']);
+
+            Route::get('/announcements', [AnnouncementController::class, 'index']);
+            Route::post('/announcements', [AnnouncementController::class, 'store']);
+            Route::get('/announcements/{announcement}', [AnnouncementController::class, 'show']);
+            Route::put('/announcements/{announcement}', [AnnouncementController::class, 'update']);
+            Route::delete('/announcements/{announcement}', [AnnouncementController::class, 'destroy']);
         });
 
         Route::get('/payments', [PaymentController::class, 'index']);
