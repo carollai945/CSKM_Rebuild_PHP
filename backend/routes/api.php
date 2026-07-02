@@ -30,6 +30,7 @@ use App\Http\Controllers\LeaveApprovalController;
 use App\Http\Controllers\PetitionApprovalController;
 use App\Http\Controllers\AnnouncementApprovalController;
 use App\Http\Controllers\ReportApprovalController;
+use App\Http\Controllers\ReimbursementController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/health', [HealthController::class, 'check']);
@@ -206,6 +207,10 @@ Route::prefix('v1')->group(function () {
         Route::post("/student-feedbacks", [StudentFeedbackController::class, "store"]);
         Route::get("/student-feedbacks/{studentFeedback}", [StudentFeedbackController::class, "show"]);
         Route::put("/student-feedbacks/{studentFeedback}", [StudentFeedbackController::class, "update"]);
+        Route::get("/reimbursements", [ReimbursementController::class, "index"]);
+        Route::post("/reimbursements", [ReimbursementController::class, "store"]);
+        Route::get("/reimbursements/{reimbursement}", [ReimbursementController::class, "show"]);
+        Route::post("/reimbursements/{reimbursement}/finance-confirm", [ReimbursementController::class, "financeConfirm"]);
+        Route::post("/reimbursements/{reimbursement}/reject", [ReimbursementController::class, "reject"]);
     });
 });
-
