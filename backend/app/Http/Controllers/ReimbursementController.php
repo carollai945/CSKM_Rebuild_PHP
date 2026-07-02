@@ -34,7 +34,7 @@ class ReimbursementController extends Controller {
     }
     public function reject(Request $request, Reimbursement $reimbursement): JsonResponse {
         Gate::authorize('management');
-        $v = $request->validate(['reject_reason'=>'nullable|string']);
+        $v = $request->validate(['reject_reason'=>'required|string|min:1']);
         $reimbursement->update(['status'=>'REJECTED','reject_reason'=>$v['reject_reason']??null]);
         return response()->json(['data'=>$reimbursement->fresh()]);
     }
