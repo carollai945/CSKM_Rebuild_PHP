@@ -23,6 +23,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PetitionController;
 use App\Http\Controllers\InvoiceRequestController;
 use App\Http\Controllers\AnnouncementController;
+use App\Http\Controllers\StudentAssignmentController;
 use App\Http\Controllers\StudentServiceController;
 use Illuminate\Support\Facades\Route;
 
@@ -126,6 +127,8 @@ Route::prefix('v1')->group(function () {
             Route::delete('/fee-items/{feeItem}', [FeeItemController::class, 'destroy']);
         });
 
+        Route::get('/students/assign', [StudentAssignmentController::class, 'index']);
+        Route::post('/students/assign', [StudentAssignmentController::class, 'batchAssign']);
         Route::get('/students', [StudentController::class, 'index']);
         Route::post('/students', [StudentController::class, 'store']);
         Route::get('/students/{student}', [StudentController::class, 'show']);
