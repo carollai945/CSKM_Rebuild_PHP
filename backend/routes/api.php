@@ -63,8 +63,12 @@ Route::prefix('v1')->group(function () {
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/me/change-password', [PasswordController::class, 'change']);
+        Route::middleware('role:admin,ceo')->group(function () {
+            Route::post('/auth/reset-password', [\App\Http\Controllers\Auth\AuthController::class, 'resetPassword']);
+        });
         Route::get('/me/personal-data', [PersonalDataController::class, 'show']);
         Route::put('/me/personal-data', [PersonalDataController::class, 'update']);
+        Route::post('/me/personal-data/photo', [PersonalDataController::class, 'uploadPhoto']);
 
         Route::get('/classrooms', [ClassroomController::class, 'index']);
         Route::middleware('role:admin,ceo')->group(function () {

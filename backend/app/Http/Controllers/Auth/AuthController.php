@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Gate;
 
 class AuthController extends Controller
 {
@@ -43,5 +44,22 @@ class AuthController extends Controller
     public function me(Request $request): JsonResponse
     {
         return response()->json($request->user());
+    }
+
+    public function resetPassword(Request $request): JsonResponse
+    {
+        Gate::authorize('management');
+
+        $request->validate([
+            'staff_id'                  => 'required|integer|exists:staff,id',
+            'new_password'              => 'required|string|min:8|confirmed',
+        ]);
+
+        $staff = \App\Models\Staff::with('user')->findOrFail($request->staff_id);
+        $staff->user->update([
+            'password' => \Illuminate\Support\Facades\Hash::make($request->new_password),
+        ]);
+
+        return response()->json(['message' => 'Password reset successfully.']);
     }
 }
