@@ -61,7 +61,6 @@ class PersonalDataController extends Controller
 
         return response()->json(['data' => $this->formatStaff($staff, 'READONLY', [])]);
     }
-}
 
     public function uploadPhoto(Request $request): JsonResponse
     {
