@@ -5,6 +5,12 @@ use App\Models\Staff;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * A03 請假申請
+ *
+ * 功能編號：A03
+ * 對應文件：docs/sdd/a03-leave-request-sdd.md
+ */
 class LeaveRequestController extends Controller {
     private function myStaffId(Request $request): ?int {
         return Staff::where('user_id', $request->user()->id)->value('id');

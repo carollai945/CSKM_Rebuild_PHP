@@ -1,6 +1,6 @@
 <template>
   <div class="page">
-    <h2>個人資料維護</h2>
+    <h2>A00 個人資料維護</h2>
     <div class="card">
       <div class="photo-section">
         <img :src="photoPreview || form.photo_url || '/default-avatar.png'" class="avatar" alt="個人照片" />
@@ -29,6 +29,7 @@
   </div>
 </template>
 <script setup lang="ts">
+// 功能編號：A00 個人資料維護
 import { ref, onMounted } from 'vue'
 import { personalDataApi } from '@/api/personalData'
 const form = ref<Record<string,unknown>>({})

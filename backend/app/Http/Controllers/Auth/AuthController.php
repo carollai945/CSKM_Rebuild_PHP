@@ -9,6 +9,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Gate;
 
+/**
+ * A01 登入 / 登出 / 重設密碼
+ *
+ * 功能編號：A01
+ * 對應文件：docs/sdd/a01-change-password-sdd.md
+ */
 class AuthController extends Controller
 {
     public function login(Request $request): JsonResponse

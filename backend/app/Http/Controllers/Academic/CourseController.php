@@ -9,6 +9,12 @@ use App\Models\Course;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * C00 課程管理
+ *
+ * 功能編號：C00
+ * 對應文件：docs/sdd/c00-institute-sdd.md
+ */
 class CourseController extends Controller
 {
     public function index(Request $request): JsonResponse

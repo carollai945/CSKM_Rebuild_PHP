@@ -5,6 +5,12 @@ use App\Models\Staff;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * A02 個人報表
+ *
+ * 功能編號：A02
+ * 對應文件：docs/sdd/a02-report-sdd.md
+ */
 class ReportController extends Controller {
     public function index(Request $request): JsonResponse {
         $staffId = Staff::where('user_id', $request->user()->id)->value('id');

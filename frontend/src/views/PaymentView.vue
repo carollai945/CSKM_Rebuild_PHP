@@ -1,6 +1,6 @@
 <template>
   <div class="page">
-    <h2>繳費記錄</h2>
+    <h2>E00 繳費記錄</h2>
     <div v-if="loading">載入中...</div>
     <table v-else>
       <thead><tr><th>ID</th><th>金額</th><th>狀態</th><th>操作</th></tr></thead>
@@ -17,6 +17,7 @@
   </div>
 </template>
 <script setup lang="ts">
+// 功能編號：E00 繳費記錄
 import { ref, onMounted } from 'vue'
 import { paymentsApi } from '@/api/payments'
 const rows = ref<Record<string,unknown>[]>([])

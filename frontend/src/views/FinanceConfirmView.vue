@@ -1,6 +1,6 @@
 <template>
   <div class="page">
-    <h2>請款財務確認</h2>
+    <h2>E03 請款財務確認</h2>
     <div v-if="loading">載入中...</div>
     <table v-else>
       <thead><tr><th>ID</th><th>金額</th><th>狀態</th><th>操作</th></tr></thead>
@@ -17,6 +17,7 @@
   </div>
 </template>
 <script setup lang="ts">
+// 功能編號：E03 請款財務確認
 import { ref, onMounted } from 'vue'
 import { reimbursementsApi } from '@/api/reimbursements'
 const rows = ref<Record<string,unknown>[]>([])

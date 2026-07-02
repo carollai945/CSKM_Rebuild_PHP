@@ -5,6 +5,12 @@ use App\Models\Staff;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * E00 繳費記錄
+ *
+ * 功能編號：E00
+ * 對應文件：docs/sdd/e00-payment-sdd.md
+ */
 class PaymentController extends Controller {
     public function index(Request $request): JsonResponse {
         $query = Payment::with(['student','feeItem'])

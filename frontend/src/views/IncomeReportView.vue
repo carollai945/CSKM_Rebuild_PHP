@@ -1,6 +1,6 @@
 <template>
   <div class="page">
-    <h2>收入報表</h2>
+    <h2>E01 收入報表</h2>
     <div class="card">
       <div class="form-group" style="display:flex;gap:1rem;align-items:flex-end">
         <div><label>起始日期</label><input type="date" v-model="from"/></div>
@@ -22,6 +22,7 @@
   </div>
 </template>
 <script setup lang="ts">
+// 功能編號：E01 收入報表
 import { ref, computed, onMounted } from 'vue'
 import { reportsApi } from '@/api/reports'
 const rows = ref<Record<string,unknown>[]>([])

@@ -1,6 +1,6 @@
 <template>
   <div class="page">
-    <h2>請假申請</h2>
+    <h2>A03 請假申請</h2>
     <div class="page-header"><div></div><button @click="showForm=true">新增請假</button></div>
     <div v-if="loading">載入中...</div>
     <table v-else>
@@ -13,7 +13,7 @@
       </tbody>
     </table>
     <div v-if="showForm" class="modal-overlay" @click.self="showForm=false">
-      <div class="modal"><h3>新增請假</h3>
+      <div class="modal"><h3>A03 請假申請</h3>
         <div><label>類型</label><select v-model="form.leave_type"><option value="ANNUAL">年假</option><option value="SICK">病假</option><option value="PERSONAL">事假</option></select></div>
         <div><label>開始</label><input type="datetime-local" v-model="form.start_at"/></div>
         <div><label>結束</label><input type="datetime-local" v-model="form.end_at"/></div>
@@ -24,6 +24,7 @@
   </div>
 </template>
 <script setup lang="ts">
+// 功能編號：A03 請假申請
 import { ref, onMounted } from 'vue'
 import { leaveRequestsApi } from '@/api/applications'
 const rows = ref<Record<string,unknown>[]>([])

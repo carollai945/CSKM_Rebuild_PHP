@@ -5,6 +5,12 @@ use App\Models\Staff;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+/**
+ * D01 簽呈審核
+ *
+ * 功能編號：D01
+ * 對應文件：docs/sdd/d01-petition-approval-sdd.md
+ */
 class PetitionApprovalController extends Controller {
     public function pending(Request $request): JsonResponse {
         Gate::authorize('management');

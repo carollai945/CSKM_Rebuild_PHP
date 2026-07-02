@@ -1,7 +1,7 @@
 <template>
   <div class="page">
     <div class="page-header">
-      <h2>電訪紀錄</h2>
+      <h2>B01 電訪進度追蹤</h2>
       <button @click="showForm = true">新增</button>
     </div>
     <div v-if="loading" class="loading">載入中...</div>
@@ -26,7 +26,7 @@
     </table>
     <div v-if="showForm" class="modal-overlay" @click.self="showForm = false">
       <div class="modal">
-        <h3>{{ editId ? '編輯' : '新增' }}電訪紀錄</h3>
+        <h3>B01 電訪進度追蹤</h3>
         <form @submit.prevent="save">
           <div><label>日期</label><input v-model="form.interview_date" placeholder="日期" /></div>
           <div><label>內容</label><input v-model="form.content" placeholder="內容" /></div>
@@ -40,6 +40,7 @@
   </div>
 </template>
 <script setup lang="ts">
+// 功能編號：B01 電訪進度追蹤
 import { ref, onMounted } from 'vue'
 import { interviewsApi } from '@/api/interviews'
 const rows = ref<Record<string,unknown>[]>([])

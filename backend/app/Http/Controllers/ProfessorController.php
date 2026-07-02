@@ -9,6 +9,12 @@ use App\Models\ProfessorFile;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * C01 師資管理
+ *
+ * 功能編號：C01
+ * 對應文件：docs/sdd/c01-professor-sdd.md
+ */
 class ProfessorController extends Controller
 {
     public function index(Request $request): JsonResponse

@@ -1,7 +1,7 @@
 <template>
   <div class="page">
     <div class="page-header">
-      <h2>師資管理</h2>
+      <h2>C01 師資管理</h2>
       <button @click="showForm = true">新增</button>
     </div>
     <div v-if="loading" class="loading">載入中...</div>
@@ -26,7 +26,7 @@
     </table>
     <div v-if="showForm" class="modal-overlay" @click.self="showForm = false">
       <div class="modal">
-        <h3>{{ editId ? '編輯' : '新增' }}師資管理</h3>
+        <h3>C01 師資管理</h3>
         <form @submit.prevent="save">
           <div><label>姓名</label><input v-model="form.name" placeholder="姓名" /></div>
           <div><label>Email</label><input v-model="form.email" placeholder="Email" /></div>
@@ -41,6 +41,7 @@
   </div>
 </template>
 <script setup lang="ts">
+// 功能編號：C01 師資管理
 import { ref, onMounted } from 'vue'
 import { professorsApi } from '@/api/professors'
 const rows = ref<Record<string,unknown>[]>([])

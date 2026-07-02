@@ -4,6 +4,12 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Gate;
+/**
+ * F03 資料庫備份
+ *
+ * 功能編號：F03
+ * 對應文件：docs/sdd/f03-system-backup-sdd.md
+ */
 class SystemBackupController extends Controller {
     public function index(): JsonResponse {
         Gate::authorize('is-admin');

@@ -1,6 +1,6 @@
 <template>
   <div class="page">
-    <h2>電訪名單 Excel 匯入</h2>
+    <h2>F04 電訪名單匯入</h2>
     <div class="card">
       <div class="form-group">
         <label>選擇 CSV/Excel 檔案</label>
@@ -13,6 +13,7 @@
   </div>
 </template>
 <script setup lang="ts">
+// 功能編號：F04 電訪名單匯入
 import { ref, onMounted } from 'vue'
 import { leadsApi } from '@/api/leads'
 const file = ref<File|null>(null); const msg = ref(''); const error = ref('')

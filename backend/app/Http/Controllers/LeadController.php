@@ -10,6 +10,12 @@ use App\Models\LeadAssignmentHistory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * B00 業務報表/電訪總覽
+ *
+ * 功能編號：B00
+ * 對應文件：docs/sdd/b00-lead-sdd.md
+ */
 class LeadController extends Controller
 {
     public function index(Request $request): JsonResponse

@@ -1,7 +1,7 @@
 <template>
   <div class="page">
     <div class="page-header">
-      <h2>學員服務紀錄</h2>
+      <h2>B02 學員服務記錄</h2>
       <button @click="showForm = true">新增</button>
     </div>
     <div v-if="loading" class="loading">載入中...</div>
@@ -26,7 +26,7 @@
     </table>
     <div v-if="showForm" class="modal-overlay" @click.self="showForm = false">
       <div class="modal">
-        <h3>{{ editId ? '編輯' : '新增' }}學員服務紀錄</h3>
+        <h3>B02 學員服務記錄</h3>
         <form @submit.prevent="save">
           <div><label>類型</label><input v-model="form.service_type" placeholder="類型" /></div>
           <div><label>日期</label><input v-model="form.service_date" placeholder="日期" /></div>
@@ -41,6 +41,7 @@
   </div>
 </template>
 <script setup lang="ts">
+// 功能編號：B02 學員服務記錄
 import { ref, onMounted } from 'vue'
 import { studentServicesApi } from '@/api/studentServices'
 const rows = ref<Record<string,unknown>[]>([])

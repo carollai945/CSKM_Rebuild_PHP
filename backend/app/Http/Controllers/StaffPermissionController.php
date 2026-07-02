@@ -9,6 +9,12 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
+/**
+ * F02 人員權限管理
+ *
+ * 功能編號：F02
+ * 對應文件：docs/sdd/f02-staff-sdd.md
+ */
 class StaffPermissionController extends Controller
 {
     /** All functional module codes */

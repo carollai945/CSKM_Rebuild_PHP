@@ -1,7 +1,7 @@
 <template>
   <div class="page">
     <div class="page-header">
-      <h2>人員管理</h2>
+      <h2>F02 人員管理</h2>
       <button @click="showForm = true">新增</button>
     </div>
     <div v-if="loading" class="loading">載入中...</div>
@@ -22,7 +22,7 @@
     <!-- Create/Edit Modal -->
     <div v-if="showForm" class="modal-overlay" @click.self="showForm = false">
       <div class="modal">
-        <h3>{{ editId ? '編輯' : '新增' }}人員</h3>
+        <h3>F02 人員管理</h3>
         <form @submit.prevent="save">
           <div><label>姓名</label><input v-model="form.name" placeholder="姓名" /></div>
           <div><label>電話</label><input v-model="form.phone" placeholder="電話" /></div>
@@ -37,7 +37,7 @@
     <!-- Reset Password Modal -->
     <div v-if="resetModal" class="modal-overlay" @click.self="resetModal = false">
       <div class="modal">
-        <h3>重設密碼 — {{ resetStaff?.name }}</h3>
+        <h3>F02 人員管理</h3>
         <div><label>新密碼</label><input type="password" v-model="resetForm.new_password" /></div>
         <div><label>確認新密碼</label><input type="password" v-model="resetForm.new_password_confirmation" /></div>
         <p v-if="resetMsg" style="color:green">{{ resetMsg }}</p>
@@ -51,6 +51,7 @@
   </div>
 </template>
 <script setup lang="ts">
+// 功能編號：F02 人員管理
 import { ref, onMounted } from 'vue'
 import { staffApi } from '@/api/staff'
 import api from '@/api/axios'

@@ -1,29 +1,30 @@
 <template>
   <div class="page">
-    <h2>部門與職稱管理</h2>
+    <h2>F01 部門/職稱管理</h2>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
       <div>
-        <div class="page-header"><h3>部門</h3><button @click="showDeptForm=true">新增部門</button></div>
+        <div class="page-header"><h3>F01 部門/職稱管理</h3><button @click="showDeptForm=true">新增部門</button></div>
         <table><thead><tr><th>ID</th><th>名稱</th><th>操作</th></tr></thead>
           <tbody><tr v-for="d in depts" :key="d.id"><td>{{d.id}}</td><td>{{d.name}}</td>
             <td><button @click="delDept(d.id as number)">刪除</button></td></tr></tbody></table>
         <div v-if="showDeptForm" class="modal-overlay" @click.self="showDeptForm=false">
-          <div class="modal"><h3>新增部門</h3><input v-model="deptName" placeholder="部門名稱"/>
+          <div class="modal"><h3>F01 部門/職稱管理</h3><input v-model="deptName" placeholder="部門名稱"/>
             <div class="modal-actions"><button @click="saveDept">儲存</button><button @click="showDeptForm=false">取消</button></div></div></div>
       </div>
       <div>
-        <div class="page-header"><h3>職稱</h3><button @click="showTitleForm=true">新增職稱</button></div>
+        <div class="page-header"><h3>F01 部門/職稱管理</h3><button @click="showTitleForm=true">新增職稱</button></div>
         <table><thead><tr><th>ID</th><th>名稱</th><th>操作</th></tr></thead>
           <tbody><tr v-for="t in titles" :key="t.id"><td>{{t.id}}</td><td>{{t.name}}</td>
             <td><button @click="delTitle(t.id as number)">刪除</button></td></tr></tbody></table>
         <div v-if="showTitleForm" class="modal-overlay" @click.self="showTitleForm=false">
-          <div class="modal"><h3>新增職稱</h3><input v-model="titleName" placeholder="職稱名稱"/>
+          <div class="modal"><h3>F01 部門/職稱管理</h3><input v-model="titleName" placeholder="職稱名稱"/>
             <div class="modal-actions"><button @click="saveTitle">儲存</button><button @click="showTitleForm=false">取消</button></div></div></div>
       </div>
     </div>
   </div>
 </template>
 <script setup lang="ts">
+// 功能編號：F01 部門/職稱管理
 import { ref, onMounted } from 'vue'
 import { departmentsApi, titlesApi } from '@/api/departments'
 const depts = ref<Record<string,unknown>[]>([])

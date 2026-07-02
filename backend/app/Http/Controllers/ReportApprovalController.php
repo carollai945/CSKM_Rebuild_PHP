@@ -5,6 +5,12 @@ use App\Models\Staff;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+/**
+ * D03 報表審核
+ *
+ * 功能編號：D03
+ * 對應文件：docs/sdd/d03-report-approval-sdd.md
+ */
 class ReportApprovalController extends Controller {
     public function pending(): JsonResponse {
         Gate::authorize('management');

@@ -10,6 +10,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * F02/F05 人員管理 / 人員列表
+ *
+ * 功能編號：F02/F05
+ * 對應文件：docs/sdd/f02-staff-sdd.md
+ */
 class StaffController extends Controller
 {
     public function index(Request $request): JsonResponse

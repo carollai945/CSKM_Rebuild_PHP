@@ -7,6 +7,12 @@ use App\Http\Requests\UpdateRegionRequest;
 use App\Models\Region;
 use Illuminate\Http\JsonResponse;
 
+/**
+ * F00 區域管理
+ *
+ * 功能編號：F00
+ * 對應文件：docs/sdd/f00-region-sdd.md
+ */
 class RegionController extends Controller
 {
     public function index(): JsonResponse

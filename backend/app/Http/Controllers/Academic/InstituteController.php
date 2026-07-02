@@ -9,6 +9,12 @@ use App\Models\Institute;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * C00 機構管理
+ *
+ * 功能編號：C00
+ * 對應文件：docs/sdd/c00-institute-sdd.md
+ */
 class InstituteController extends Controller
 {
     public function index(Request $request): JsonResponse

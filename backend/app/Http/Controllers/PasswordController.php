@@ -6,6 +6,12 @@ use App\Http\Requests\ChangePasswordRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 
+/**
+ * A01 修改密碼
+ *
+ * 功能編號：A01
+ * 對應文件：docs/sdd/a01-change-password-sdd.md
+ */
 class PasswordController extends Controller
 {
     public function change(ChangePasswordRequest $request): JsonResponse

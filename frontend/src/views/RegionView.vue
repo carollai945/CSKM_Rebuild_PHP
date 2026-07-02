@@ -1,7 +1,7 @@
 <template>
   <div class="page">
     <div class="page-header">
-      <h2>區域管理</h2>
+      <h2>F00 區域管理</h2>
       <button @click="showForm = true">新增</button>
     </div>
     <div v-if="loading" class="loading">載入中...</div>
@@ -24,7 +24,7 @@
     </table>
     <div v-if="showForm" class="modal-overlay" @click.self="showForm = false">
       <div class="modal">
-        <h3>{{ editId ? '編輯' : '新增' }}區域管理</h3>
+        <h3>F00 區域管理</h3>
         <form @submit.prevent="save">
           <div><label>名稱</label><input v-model="form.name" placeholder="名稱" /></div>
           <div class="modal-actions">
@@ -37,6 +37,7 @@
   </div>
 </template>
 <script setup lang="ts">
+// 功能編號：F00 區域管理
 import { ref, onMounted } from 'vue'
 import { regionsApi } from '@/api/regions'
 const rows = ref<Record<string,unknown>[]>([])

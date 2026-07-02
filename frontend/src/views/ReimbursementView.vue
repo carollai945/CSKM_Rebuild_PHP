@@ -1,6 +1,6 @@
 <template>
   <div class="page">
-    <h2>請款單列表</h2>
+    <h2>E02 請款單列表</h2>
     <div class="page-header"><div></div><button @click="showForm=true">新增請款</button></div>
     <div v-if="loading">載入中...</div>
     <table v-else>
@@ -13,7 +13,7 @@
       </tbody>
     </table>
     <div v-if="showForm" class="modal-overlay" @click.self="showForm=false">
-      <div class="modal"><h3>新增請款</h3>
+      <div class="modal"><h3>E02 請款單列表</h3>
         <div><label>金額</label><input type="number" v-model="form.amount"/></div>
         <div><label>說明</label><textarea v-model="form.description" rows="3"/></div>
         <div class="modal-actions"><button @click="save">送出</button><button @click="showForm=false">取消</button></div>
@@ -22,6 +22,7 @@
   </div>
 </template>
 <script setup lang="ts">
+// 功能編號：E02 請款單列表
 import { ref, onMounted } from 'vue'
 import { reimbursementsApi } from '@/api/reimbursements'
 const rows = ref<Record<string,unknown>[]>([])

@@ -1,6 +1,6 @@
 <template>
   <div class="page">
-    <h2>人員列表</h2>
+    <h2>F05 人員列表</h2>
     <div v-if="loading" class="loading">載入中...</div>
     <table v-else>
       <thead><tr><th>員工編號</th><th>姓名</th><th>狀態</th></tr></thead>
@@ -11,6 +11,7 @@
   </div>
 </template>
 <script setup lang="ts">
+// 功能編號：F05 人員列表
 import { ref, onMounted } from 'vue'
 import { staffApi } from '@/api/staff'
 const list = ref<Record<string,unknown>[]>([])

@@ -1,12 +1,12 @@
 <template>
   <div class="page">
     <div class="page-header">
-      <h2>學員明細 — {{ form.name }}</h2>
+      <h2>C046 學員明細</h2>
       <RouterLink to="/students">← 返回列表</RouterLink>
     </div>
     <div v-if="loading" class="loading">載入中...</div>
     <div v-else class="card">
-      <h3>基本資料</h3>
+      <h3>C046 學員明細</h3>
       <div class="grid-2">
         <div class="form-group"><label>姓名 <span class="req">*</span></label><input v-model="form.name" required /></div>
         <div class="form-group"><label>學號</label><input :value="form.student_no" readonly style="background:#fafafa"/></div>
@@ -73,6 +73,7 @@
   </div>
 </template>
 <script setup lang="ts">
+// 功能編號：C046 學員明細
 import { ref, onMounted } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
 import api from '@/api/axios'

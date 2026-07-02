@@ -4,6 +4,12 @@ use App\Models\Announcement;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+/**
+ * D02 公告審核
+ *
+ * 功能編號：D02
+ * 對應文件：docs/sdd/d02-announcement-approval-sdd.md
+ */
 class AnnouncementApprovalController extends Controller {
     public function pending(): JsonResponse {
         Gate::authorize('management');

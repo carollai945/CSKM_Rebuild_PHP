@@ -4,6 +4,12 @@ use App\Models\Announcement;
 use App\Models\Staff;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+/**
+ * A06 公告管理
+ *
+ * 功能編號：A06
+ * 對應文件：docs/sdd/a06-announcement-sdd.md
+ */
 class AnnouncementController extends Controller {
     private function myStaffId(Request $r): ?int { return Staff::where('user_id',$r->user()->id)->value('id'); }
     public function index(Request $request): JsonResponse {

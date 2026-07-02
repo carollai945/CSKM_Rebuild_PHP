@@ -1,6 +1,6 @@
 <template>
   <div class="page">
-    <h2>資料庫備份</h2>
+    <h2>F03 資料庫備份</h2>
     <div class="card">
       <button @click="createBackup" style="margin-bottom:1.5rem">立即備份</button>
       <div v-if="loading">載入中...</div>
@@ -16,6 +16,7 @@
   </div>
 </template>
 <script setup lang="ts">
+// 功能編號：F03 資料庫備份
 import { ref, onMounted } from 'vue'
 import { systemApi } from '@/api/system'
 const rows = ref<Record<string,unknown>[]>([])

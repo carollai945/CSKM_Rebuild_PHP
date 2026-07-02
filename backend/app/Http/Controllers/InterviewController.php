@@ -8,6 +8,12 @@ use App\Models\InterviewRecord;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * B01 電訪進度追蹤
+ *
+ * 功能編號：B01
+ * 對應文件：docs/sdd/b01-interview-sdd.md
+ */
 class InterviewController extends Controller
 {
     public function index(Request $request): JsonResponse

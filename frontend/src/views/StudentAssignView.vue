@@ -1,6 +1,6 @@
 <template>
   <div class="page">
-    <h2>學員分配管理</h2>
+    <h2>C04 學生分配管理</h2>
     <div class="card">
       <p>批次指派學員顧問</p>
       <div class="form-group"><label>學員 ID（逗號分隔）</label><input v-model="studentIds" placeholder="1,2,3"/></div>
@@ -11,6 +11,7 @@
   </div>
 </template>
 <script setup lang="ts">
+// 功能編號：C04 學生分配管理
 import { ref, onMounted } from 'vue'
 import { studentsApi } from '@/api/students'
 const studentIds = ref(''); const staffId = ref<number|null>(null); const msg = ref('')

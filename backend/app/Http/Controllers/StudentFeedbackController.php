@@ -5,6 +5,12 @@ use App\Models\StudentFeedback;
 use App\Models\Staff;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+/**
+ * B02 課程業績
+ *
+ * 功能編號：B02
+ * 對應文件：docs/sdd/b02-student-feedback-sdd.md
+ */
 class StudentFeedbackController extends Controller {
     public function index(Request $request): JsonResponse {
         $q = StudentFeedback::with(['student','handler'])
