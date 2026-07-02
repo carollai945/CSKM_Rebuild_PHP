@@ -187,9 +187,10 @@ Route::prefix('v1')->group(function () {
             Route::get('/leave-requests/pending', [LeaveApprovalController::class, 'pending']);
             Route::post('/leave-requests/{leaveRequest}/approve', [LeaveApprovalController::class, 'approve']);
             Route::post('/leave-requests/{leaveRequest}/reject', [LeaveApprovalController::class, 'reject']);
-        });
-    });
-});            Route::get('/petitions/pending', [PetitionApprovalController::class, 'pending']);
+            Route::get('/petitions/pending', [PetitionApprovalController::class, 'pending']);
             Route::post('/petitions/{petition}/approve', [PetitionApprovalController::class, 'approve']);
             Route::post('/petitions/{petition}/reject', [PetitionApprovalController::class, 'reject']);
+        });
+    });
+});
 
