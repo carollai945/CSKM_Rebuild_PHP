@@ -34,6 +34,28 @@ class LeadController extends Controller
             $query->where('assigned_staff_id', $request->assigned_staff_id);
         }
 
+        if ($request->filled('from')) {
+            $query->whereDate('created_at', '>=', $request->from);
+        }
+        if ($request->filled('to')) {
+            $query->whereDate('created_at', '<=', $request->to);
+        }
+        // Role-based scoping: staff only sees own leads
+        $user = $request->user();
+        $role = $user->role->value ?? $user->role;
+        if ($role === 'staff') {
+            $staff = \App\Models\Staff::where('user_id', $user->id)->first();
+            if ($staff) {
+                $query->where('assigned_staff_id', $staff->id);
+            }
+        } elseif ($role === 'regmgr') {
+            $staff = \App\Models\Staff::where('user_id', $user->id)->first();
+            if ($staff) {
+                $query->whereHas('region', function ($q) use ($staff) {
+                    $q->whereIn('id', \App\Models\Staff::where('region_id', $staff->region_id)->pluck('region_id'));
+                })->orWhere('region_id', $staff->region_id);
+            }
+        }
         if ($request->filled('keyword')) {
             $keyword = '%' . $request->keyword . '%';
             $query->where(function ($q) use ($keyword) {
