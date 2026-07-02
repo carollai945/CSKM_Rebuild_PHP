@@ -16,6 +16,9 @@ class PaymentController extends Controller {
         $query = Payment::with(['student','feeItem'])
             ->when($request->student_id, fn($q,$v) => $q->where('student_id',$v))
             ->when($request->status, fn($q,$v) => $q->where('status',$v))
+            ->when($request->keyword, fn($q,$v) => $q->whereHas('student', fn($sq) => $sq->where('name','like',"%{$v}%")))
+            ->when($request->from, fn($q,$v) => $q->where('payment_date','>=',$v))
+            ->when($request->to,   fn($q,$v) => $q->where('payment_date','<=',$v))
             ->latest();
         return response()->json(['data' => $query->paginate(20)]);
     }
