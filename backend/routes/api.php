@@ -206,15 +206,23 @@ Route::prefix('v1')->group(function () {
             Route::get('/leave-requests/pending', [LeaveApprovalController::class, 'pending']);
             Route::post('/leave-requests/{leaveRequest}/approve', [LeaveApprovalController::class, 'approve']);
             Route::post('/leave-requests/{leaveRequest}/reject', [LeaveApprovalController::class, 'reject']);
+            Route::post('/leave-requests/batch-approve', [LeaveApprovalController::class, 'batchApprove']);
+            Route::post('/leave-requests/batch-reject', [LeaveApprovalController::class, 'batchReject']);
             Route::get('/petitions/pending', [PetitionApprovalController::class, 'pending']);
             Route::post('/petitions/{petition}/approve', [PetitionApprovalController::class, 'approve']);
             Route::post('/petitions/{petition}/reject', [PetitionApprovalController::class, 'reject']);
+            Route::post('/petitions/batch-approve', [PetitionApprovalController::class, 'batchApprove']);
+            Route::post('/petitions/batch-reject', [PetitionApprovalController::class, 'batchReject']);
             Route::get('/announcements/pending', [AnnouncementApprovalController::class, 'pending']);
             Route::post('/announcements/{announcement}/approve', [AnnouncementApprovalController::class, 'approve']);
             Route::post('/announcements/{announcement}/reject', [AnnouncementApprovalController::class, 'reject']);
+            Route::post('/announcements/batch-approve', [AnnouncementApprovalController::class, 'batchApprove']);
+            Route::post('/announcements/batch-reject', [AnnouncementApprovalController::class, 'batchReject']);
             Route::get('/reports/pending', [ReportApprovalController::class, 'pending']);
             Route::post('/reports/{report}/approve', [ReportApprovalController::class, 'approve']);
             Route::post('/reports/{report}/reject', [ReportApprovalController::class, 'reject']);
+            Route::post('/reports/batch-approve', [ReportApprovalController::class, 'batchApprove']);
+            Route::post('/reports/batch-reject', [ReportApprovalController::class, 'batchReject']);
         });
 
         Route::get("/student-feedbacks", [StudentFeedbackController::class, "index"]);

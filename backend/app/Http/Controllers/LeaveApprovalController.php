@@ -27,4 +27,21 @@ class LeaveApprovalController extends Controller {
         $leaveRequest->update(['status'=>'REJECTED','reject_reason'=>$validated['reject_reason']??null]);
         return response()->json(['data'=>$leaveRequest->fresh()]);
     }
+
+    public function batchApprove(Request $request): JsonResponse {
+        Gate::authorize('management');
+        $request->validate(['ids' => 'required|array', 'ids.*' => 'integer']);
+        $staffId = \App\Models\Staff::where('user_id', $request->user()->id)->value('id');
+        $count = LeaveRequest::whereIn('id', $request->ids)->where('status', 'PENDING')
+            ->update(['status' => 'APPROVED', 'approved_by' => $staffId]);
+        return response()->json(['data' => ['approved_count' => $count]]);
+    }
+
+    public function batchReject(Request $request): JsonResponse {
+        Gate::authorize('management');
+        $request->validate(['ids' => 'required|array', 'ids.*' => 'integer', 'reject_reason' => 'nullable|string']);
+        $count = LeaveRequest::whereIn('id', $request->ids)->where('status', 'PENDING')
+            ->update(['status' => 'REJECTED', 'reject_reason' => $request->reject_reason]);
+        return response()->json(['data' => ['rejected_count' => $count]]);
+    }
 }
