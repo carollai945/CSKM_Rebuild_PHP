@@ -18,6 +18,7 @@ use App\Http\Controllers\RegionController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\LeaveRequestController;
 use App\Http\Controllers\StudentServiceController;
 use Illuminate\Support\Facades\Route;
 
@@ -140,5 +141,13 @@ Route::prefix('v1')->group(function () {
         Route::get('/reports/{report}', [ReportController::class, 'show']);
         Route::put('/reports/{report}', [ReportController::class, 'update']);
         Route::post('/reports/{report}/submit', [ReportController::class, 'submit']);
+
+        Route::prefix('applications')->group(function () {
+            Route::get('/leave-requests', [LeaveRequestController::class, 'index']);
+            Route::post('/leave-requests', [LeaveRequestController::class, 'store']);
+            Route::get('/leave-requests/{leaveRequest}', [LeaveRequestController::class, 'show']);
+            Route::put('/leave-requests/{leaveRequest}', [LeaveRequestController::class, 'update']);
+            Route::delete('/leave-requests/{leaveRequest}', [LeaveRequestController::class, 'destroy']);
+        });
     });
 });
