@@ -24,6 +24,7 @@ use App\Http\Controllers\PetitionController;
 use App\Http\Controllers\InvoiceRequestController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\StudentAssignmentController;
+use App\Http\Controllers\StudentFeedbackController;
 use App\Http\Controllers\StudentServiceController;
 use App\Http\Controllers\LeaveApprovalController;
 use App\Http\Controllers\PetitionApprovalController;
@@ -185,7 +186,8 @@ Route::prefix('v1')->group(function () {
         Route::post('/payments/{payment}/finance-confirm', [PaymentController::class, 'financeConfirm']);
         Route::post('/payments/{payment}/academic-confirm', [PaymentController::class, 'academicConfirm']);
         Route::post('/payments/{payment}/reject', [PaymentController::class, 'reject']);
-    Route::prefix('approvals')->group(function () {
+
+        Route::prefix('approvals')->group(function () {
             Route::get('/leave-requests/pending', [LeaveApprovalController::class, 'pending']);
             Route::post('/leave-requests/{leaveRequest}/approve', [LeaveApprovalController::class, 'approve']);
             Route::post('/leave-requests/{leaveRequest}/reject', [LeaveApprovalController::class, 'reject']);
@@ -199,6 +201,11 @@ Route::prefix('v1')->group(function () {
             Route::post('/reports/{report}/approve', [ReportApprovalController::class, 'approve']);
             Route::post('/reports/{report}/reject', [ReportApprovalController::class, 'reject']);
         });
+
+        Route::get("/student-feedbacks", [StudentFeedbackController::class, "index"]);
+        Route::post("/student-feedbacks", [StudentFeedbackController::class, "store"]);
+        Route::get("/student-feedbacks/{studentFeedback}", [StudentFeedbackController::class, "show"]);
+        Route::put("/student-feedbacks/{studentFeedback}", [StudentFeedbackController::class, "update"]);
     });
 });
 
