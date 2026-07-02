@@ -20,6 +20,7 @@ use App\Http\Controllers\StaffController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\LeaveRequestController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PetitionController;
 use App\Http\Controllers\StudentServiceController;
 use Illuminate\Support\Facades\Route;
 
@@ -149,6 +150,12 @@ Route::prefix('v1')->group(function () {
             Route::get('/leave-requests/{leaveRequest}', [LeaveRequestController::class, 'show']);
             Route::put('/leave-requests/{leaveRequest}', [LeaveRequestController::class, 'update']);
             Route::delete('/leave-requests/{leaveRequest}', [LeaveRequestController::class, 'destroy']);
+
+            Route::get('/petitions', [PetitionController::class, 'index']);
+            Route::post('/petitions', [PetitionController::class, 'store']);
+            Route::get('/petitions/{petition}', [PetitionController::class, 'show']);
+            Route::put('/petitions/{petition}', [PetitionController::class, 'update']);
+            Route::delete('/petitions/{petition}', [PetitionController::class, 'destroy']);
         });
 
         Route::get('/payments', [PaymentController::class, 'index']);
