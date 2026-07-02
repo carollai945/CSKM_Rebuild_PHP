@@ -86,14 +86,12 @@ const filters = ref({ result_code: '', from: '', to: '' })
 
 async function load() {
   loading.value = true
-  const params: Record<string,unknown> = { page: page.value }
+  const params: Record<string,unknown> = {}
   if (filters.value.result_code) params.result_code = filters.value.result_code
   if (filters.value.from) params.from = filters.value.from
   if (filters.value.to) params.to = filters.value.to
   const r = await interviewsApi.list(params)
-  const d = r.data?.data
-  rows.value = d?.data ?? d ?? []
-  lastPage.value = d?.last_page ?? 1
+  rows.value = r.data?.data ?? []
   loading.value = false
 }
 
