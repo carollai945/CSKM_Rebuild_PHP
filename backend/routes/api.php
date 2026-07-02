@@ -28,6 +28,7 @@ use App\Http\Controllers\StudentServiceController;
 use App\Http\Controllers\LeaveApprovalController;
 use App\Http\Controllers\PetitionApprovalController;
 use App\Http\Controllers\AnnouncementApprovalController;
+use App\Http\Controllers\ReportApprovalController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/health', [HealthController::class, 'check']);
@@ -194,6 +195,9 @@ Route::prefix('v1')->group(function () {
             Route::get('/announcements/pending', [AnnouncementApprovalController::class, 'pending']);
             Route::post('/announcements/{announcement}/approve', [AnnouncementApprovalController::class, 'approve']);
             Route::post('/announcements/{announcement}/reject', [AnnouncementApprovalController::class, 'reject']);
+            Route::get('/reports/pending', [ReportApprovalController::class, 'pending']);
+            Route::post('/reports/{report}/approve', [ReportApprovalController::class, 'approve']);
+            Route::post('/reports/{report}/reject', [ReportApprovalController::class, 'reject']);
         });
     });
 });
