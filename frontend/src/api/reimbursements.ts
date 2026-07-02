@@ -4,5 +4,5 @@ export const reimbursementsApi = {
   get: (id: number) => api.get(`/reimbursements/${id}`),
   create: (d: Record<string,unknown>) => api.post('/reimbursements', d),
   financeConfirm: (id: number) => api.post(`/reimbursements/${id}/finance-confirm`),
-  reject: (id: number) => api.post(`/reimbursements/${id}/reject`),
+  reject: (id: number, reason?: string) => api.post(`/reimbursements/${id}/reject`, { reject_reason: reason }),
 }
