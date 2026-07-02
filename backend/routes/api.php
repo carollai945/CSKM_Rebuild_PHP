@@ -15,13 +15,13 @@ use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\PersonalDataController;
 use App\Http\Controllers\ProfessorController;
 use App\Http\Controllers\RegionController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\StudentServiceController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/health', [HealthController::class, 'check']);
-
 Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
     Route::get('/admin/ping', fn () => response()->json(['status' => 'ok']));
 });
@@ -29,7 +29,6 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
 Route::prefix('v1')->group(function () {
     Route::prefix('auth')->group(function () {
         Route::post('/login', [AuthController::class, 'login']);
-
         Route::middleware('auth:sanctum')->group(function () {
             Route::post('/logout', [AuthController::class, 'logout']);
             Route::get('/me', [AuthController::class, 'me']);
@@ -38,13 +37,11 @@ Route::prefix('v1')->group(function () {
 
     Route::prefix('master')->group(function () {
         Route::get('/regions', [RegionController::class, 'index']);
-
         Route::middleware(['auth:sanctum', 'role:admin,ceo'])->group(function () {
             Route::post('/regions', [RegionController::class, 'store']);
             Route::put('/regions/{region}', [RegionController::class, 'update']);
             Route::delete('/regions/{region}', [RegionController::class, 'destroy']);
         });
-
         Route::apiResource('departments', DepartmentController::class)->only(['index', 'store', 'update', 'destroy']);
         Route::apiResource('titles', TitleController::class)->only(['index', 'store', 'update', 'destroy']);
     });
@@ -137,5 +134,11 @@ Route::prefix('v1')->group(function () {
         Route::get('/student-services/{studentService}', [StudentServiceController::class, 'show']);
         Route::put('/student-services/{studentService}', [StudentServiceController::class, 'update']);
         Route::delete('/student-services/{studentService}', [StudentServiceController::class, 'destroy']);
+
+        Route::get('/reports', [ReportController::class, 'index']);
+        Route::post('/reports', [ReportController::class, 'store']);
+        Route::get('/reports/{report}', [ReportController::class, 'show']);
+        Route::put('/reports/{report}', [ReportController::class, 'update']);
+        Route::post('/reports/{report}/submit', [ReportController::class, 'submit']);
     });
 });
