@@ -17,6 +17,7 @@ use App\Http\Controllers\ProfessorController;
 use App\Http\Controllers\RegionController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\ReimbursementController;
 use App\Http\Controllers\StudentServiceController;
 use Illuminate\Support\Facades\Route;
 
@@ -137,5 +138,11 @@ Route::prefix('v1')->group(function () {
         Route::get('/student-services/{studentService}', [StudentServiceController::class, 'show']);
         Route::put('/student-services/{studentService}', [StudentServiceController::class, 'update']);
         Route::delete('/student-services/{studentService}', [StudentServiceController::class, 'destroy']);
+
+        Route::get('/reimbursements', [ReimbursementController::class, 'index']);
+        Route::post('/reimbursements', [ReimbursementController::class, 'store']);
+        Route::get('/reimbursements/{reimbursement}', [ReimbursementController::class, 'show']);
+        Route::post('/reimbursements/{reimbursement}/finance-confirm', [ReimbursementController::class, 'financeConfirm']);
+        Route::post('/reimbursements/{reimbursement}/reject', [ReimbursementController::class, 'reject']);
     });
 });
