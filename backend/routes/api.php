@@ -19,6 +19,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\LeaveRequestController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\StudentServiceController;
 use Illuminate\Support\Facades\Route;
 
@@ -149,5 +150,12 @@ Route::prefix('v1')->group(function () {
             Route::put('/leave-requests/{leaveRequest}', [LeaveRequestController::class, 'update']);
             Route::delete('/leave-requests/{leaveRequest}', [LeaveRequestController::class, 'destroy']);
         });
+
+        Route::get('/payments', [PaymentController::class, 'index']);
+        Route::post('/payments', [PaymentController::class, 'store']);
+        Route::get('/payments/{payment}', [PaymentController::class, 'show']);
+        Route::post('/payments/{payment}/finance-confirm', [PaymentController::class, 'financeConfirm']);
+        Route::post('/payments/{payment}/academic-confirm', [PaymentController::class, 'academicConfirm']);
+        Route::post('/payments/{payment}/reject', [PaymentController::class, 'reject']);
     });
 });
