@@ -229,6 +229,7 @@ Route::prefix('v1')->group(function () {
         Route::post("/student-feedbacks", [StudentFeedbackController::class, "store"]);
         Route::get("/student-feedbacks/{studentFeedback}", [StudentFeedbackController::class, "show"]);
         Route::put("/student-feedbacks/{studentFeedback}", [StudentFeedbackController::class, "update"]);
+        Route::delete("/student-feedbacks/{studentFeedback}", [StudentFeedbackController::class, "destroy"]);
         Route::get("/reimbursements", [ReimbursementController::class, "index"]);
         Route::post("/reimbursements", [ReimbursementController::class, "store"]);
         Route::get("/reimbursements/{reimbursement}", [ReimbursementController::class, "show"]);

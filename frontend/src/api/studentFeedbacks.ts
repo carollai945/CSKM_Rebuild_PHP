@@ -4,4 +4,6 @@ export const studentFeedbacksApi = {
   get: (id: number) => api.get(`/student-feedbacks/${id}`),
   create: (d: Record<string,unknown>) => api.post('/student-feedbacks', d),
   update: (id: number, d: Record<string,unknown>) => api.put(`/student-feedbacks/${id}`, d),
+  delete: (id: number) => api.delete(`/student-feedbacks/${id}`),
 }
+

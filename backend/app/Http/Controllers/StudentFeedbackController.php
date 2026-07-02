@@ -16,6 +16,9 @@ class StudentFeedbackController extends Controller {
         $q = StudentFeedback::with(['student','handler'])
             ->when($request->student_id,fn($q,$v)=>$q->where('student_id',$v))
             ->when($request->status,fn($q,$v)=>$q->where('status',$v))
+            ->when($request->filled('keyword'),fn($q)=>$q->whereHas('student',fn($sq)=>$sq->where('name','like','%'.$request->keyword.'%')))
+            ->when($request->filled('from'),fn($q)=>$q->whereDate('created_at','>=',$request->from))
+            ->when($request->filled('to'),fn($q)=>$q->whereDate('created_at','<=',$request->to))
             ->latest();
         return response()->json(['data'=>$q->paginate(20)]);
     }
@@ -32,5 +35,9 @@ class StudentFeedbackController extends Controller {
         }
         $studentFeedback->update($v);
         return response()->json(['data'=>$studentFeedback->fresh()]);
+    }
+    public function destroy(StudentFeedback $studentFeedback): JsonResponse {
+        $studentFeedback->delete();
+        return response()->json(['data' => null], 204);
     }
 }
