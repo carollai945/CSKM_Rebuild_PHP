@@ -28,6 +28,7 @@ const router = createRouter({
         { path: 'approvals/reports', name: 'report-approval', component: () => import('@/views/ReportApprovalView.vue') },
         // Student feedbacks
         { path: 'student-feedbacks', name: 'student-feedbacks', component: () => import('@/views/StudentFeedbackView.vue') },
+        { path: 'student-feedbacks/:id', name: 'student-feedback-detail', component: () => import('@/views/StudentFeedbackDetailView.vue') },
         // Finance
         { path: 'payments', name: 'payments', component: () => import('@/views/PaymentView.vue') },
         { path: 'reports/income', name: 'income-report', component: () => import('@/views/IncomeReportView.vue') },
