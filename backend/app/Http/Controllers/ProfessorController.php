@@ -88,4 +88,14 @@ class ProfessorController extends Controller
 
         return response()->json(null, 204);
     }
+
+    public function uploadPhoto(Request $request, Professor $professor): JsonResponse
+    {
+        $request->validate(['photo' => 'required|image|max:5120']);
+        $file = $request->file('photo');
+        $filename = 'C:/CSKM/Img/C01/' . $professor->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+        $professor->update(['photo_path' => $filename]);
+        return response()->json(['data' => ['photo_path' => $filename]]);
+    }
+
 }

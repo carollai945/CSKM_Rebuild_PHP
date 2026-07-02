@@ -124,6 +124,7 @@ Route::prefix('v1')->group(function () {
             Route::put('/professors/{professor}', [ProfessorController::class, 'update']);
             Route::delete('/professors/{professor}', [ProfessorController::class, 'destroy']);
             Route::delete('/professors/{professor}/files/{file}', [ProfessorController::class, 'destroyFile']);
+            Route::post('/professors/{professor}/photo', [ProfessorController::class, 'uploadPhoto']);
         });
 
         Route::get('/leads', [LeadController::class, 'index']);
