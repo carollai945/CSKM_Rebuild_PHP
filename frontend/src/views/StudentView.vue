@@ -1,7 +1,7 @@
 <template>
   <div class="page">
     <div class="page-header">
-      <h2>學員管理</h2>
+      <h2>C02 學生管理</h2>
       <button @click="showForm = true">新增</button>
     </div>
     <div v-if="loading" class="loading">載入中...</div>
@@ -28,7 +28,7 @@
     </table>
     <div v-if="showForm" class="modal-overlay" @click.self="showForm = false">
       <div class="modal">
-        <h3>{{ editId ? '編輯' : '新增' }}學員管理</h3>
+        <h3>C02 學生管理</h3>
         <form @submit.prevent="save">
           <div><label>學號</label><input v-model="form.student_no" placeholder="學號" /></div>
           <div><label>姓名</label><input v-model="form.name" placeholder="姓名" /></div>
@@ -42,6 +42,7 @@
   </div>
 </template>
 <script setup lang="ts">
+// 功能編號：C02 學生管理
 import { ref, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { studentsApi } from '@/api/students'

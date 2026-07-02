@@ -6,6 +6,12 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
+/**
+ * D00 請假單審核
+ *
+ * 功能編號：D00
+ * 對應文件：docs/sdd/d00-leave-approval-sdd.md
+ */
 class LeaveApprovalController extends Controller {
     public function pending(Request $request): JsonResponse {
         Gate::authorize('management');

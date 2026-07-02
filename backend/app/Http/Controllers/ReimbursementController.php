@@ -5,6 +5,12 @@ use App\Models\Staff;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+/**
+ * E02/E03 請款單 / 財務確認
+ *
+ * 功能編號：E02/E03
+ * 對應文件：docs/sdd/e02-reimbursement-sdd.md
+ */
 class ReimbursementController extends Controller {
     private function myStaffId(Request $r): ?int { return Staff::where('user_id',$r->user()->id)->value('id'); }
     public function index(Request $request): JsonResponse {

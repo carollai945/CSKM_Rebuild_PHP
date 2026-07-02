@@ -5,6 +5,12 @@ use App\Models\Staff;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * A04 簽呈申請
+ *
+ * 功能編號：A04
+ * 對應文件：docs/sdd/a04-petition-sdd.md
+ */
 class PetitionController extends Controller {
     private function myStaffId(Request $r): ?int { return Staff::where('user_id',$r->user()->id)->value('id'); }
 

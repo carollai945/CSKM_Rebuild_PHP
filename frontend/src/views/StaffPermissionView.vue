@@ -1,7 +1,7 @@
 <template>
   <div class="page">
     <div class="page-header">
-      <h2>人員權限管理 — {{ staffName }}</h2>
+      <h2>F02 人員權限管理</h2>
       <RouterLink to="/staff">← 返回人員列表</RouterLink>
     </div>
     <div v-if="loading" class="loading">載入中...</div>
@@ -31,6 +31,7 @@
   </div>
 </template>
 <script setup lang="ts">
+// 功能編號：F02 人員權限管理
 import { ref, onMounted } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
 import api from '@/api/axios'

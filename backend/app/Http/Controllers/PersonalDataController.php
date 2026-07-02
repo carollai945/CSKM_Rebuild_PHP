@@ -7,6 +7,12 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
+/**
+ * A00 個人資料維護
+ *
+ * 功能編號：A00
+ * 對應文件：docs/sdd/a00-personal-data-sdd.md
+ */
 class PersonalDataController extends Controller
 {
     private function formatStaff(Staff $staff, string $status, array $actions): array

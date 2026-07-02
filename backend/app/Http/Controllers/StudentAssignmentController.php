@@ -6,6 +6,12 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
+/**
+ * C04 學生分配管理
+ *
+ * 功能編號：C04
+ * 對應文件：docs/sdd/c04-student-assignment-sdd.md
+ */
 class StudentAssignmentController extends Controller {
     public function index(Request $request): JsonResponse {
         Gate::authorize('management');

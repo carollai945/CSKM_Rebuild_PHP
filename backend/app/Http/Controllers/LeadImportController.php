@@ -4,6 +4,12 @@ use App\Models\Lead;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+/**
+ * F04 電訪名單匯入
+ *
+ * 功能編號：F04
+ * 對應文件：docs/sdd/f04-lead-import-sdd.md
+ */
 class LeadImportController extends Controller {
     public function import(Request $request): JsonResponse {
         Gate::authorize('management');

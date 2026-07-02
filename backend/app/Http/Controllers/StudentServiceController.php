@@ -6,6 +6,12 @@ use App\Models\StudentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * B02 學員服務記錄
+ *
+ * 功能編號：B02
+ * 對應文件：docs/sdd/b02-student-service-sdd.md
+ */
 class StudentServiceController extends Controller
 {
     public function index(Request $request): JsonResponse

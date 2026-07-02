@@ -1,35 +1,36 @@
 <template>
   <div class="page">
-    <h2>課程/機構/科目設定</h2>
+    <h2>C00 課程/機構總覽</h2>
     <div class="tabs">
       <button :class="{active:tab==='institute'}" @click="tab='institute'">機構</button>
       <button :class="{active:tab==='course'}" @click="tab='course'">課程</button>
       <button :class="{active:tab==='subject'}" @click="tab='subject'">科目</button>
     </div>
     <div v-if="tab==='institute'">
-      <div class="page-header"><h3>機構列表</h3><button @click="showForm('institute')">新增</button></div>
+      <div class="page-header"><h3>C00 課程/機構總覽</h3><button @click="showForm('institute')">新增</button></div>
       <table><thead><tr><th>ID</th><th>名稱</th><th>操作</th></tr></thead>
         <tbody><tr v-for="r in institutes" :key="r.id"><td>{{r.id}}</td><td>{{r.name}}</td>
           <td><button @click="del('institute',r.id as number)">刪除</button></td></tr></tbody></table>
     </div>
     <div v-if="tab==='course'">
-      <div class="page-header"><h3>課程列表</h3><button @click="showForm('course')">新增</button></div>
+      <div class="page-header"><h3>C00 課程/機構總覽</h3><button @click="showForm('course')">新增</button></div>
       <table><thead><tr><th>ID</th><th>名稱</th><th>操作</th></tr></thead>
         <tbody><tr v-for="r in courses" :key="r.id"><td>{{r.id}}</td><td>{{r.name}}</td>
           <td><button @click="del('course',r.id as number)">刪除</button></td></tr></tbody></table>
     </div>
     <div v-if="tab==='subject'">
-      <div class="page-header"><h3>科目列表</h3><button @click="showForm('subject')">新增</button></div>
+      <div class="page-header"><h3>C00 課程/機構總覽</h3><button @click="showForm('subject')">新增</button></div>
       <table><thead><tr><th>ID</th><th>名稱</th><th>操作</th></tr></thead>
         <tbody><tr v-for="r in subjects" :key="r.id"><td>{{r.id}}</td><td>{{r.name}}</td>
           <td><button @click="del('subject',r.id as number)">刪除</button></td></tr></tbody></table>
     </div>
     <div v-if="activeForm" class="modal-overlay" @click.self="activeForm=null">
-      <div class="modal"><h3>新增</h3><input v-model="formName" placeholder="名稱"/>
+      <div class="modal"><h3>C00 課程/機構總覽</h3><input v-model="formName" placeholder="名稱"/>
         <div class="modal-actions"><button @click="save">儲存</button><button @click="activeForm=null">取消</button></div></div></div>
   </div>
 </template>
 <script setup lang="ts">
+// 功能編號：C00 課程/機構總覽
 import { ref, onMounted } from 'vue'
 import { institutesApi, coursesApi, subjectsApi } from '@/api/institutes'
 const tab = ref('institute')

@@ -1,7 +1,7 @@
 <template>
   <div class="page">
     <div class="page-header">
-      <h2>請假單批核</h2>
+      <h2>D00 請假單審核</h2>
       <div v-if="selected.length">
         <button @click="batchApprove" style="background:#52c41a">批次核准({{ selected.length }})</button>
         <button @click="batchRejectModal=true" style="background:#ff4d4f;margin-left:.5rem">批次退回({{ selected.length }})</button>
@@ -29,7 +29,7 @@
     <p v-if="!loading&&rows.length===0" style="text-align:center;color:#999;padding:2rem">目前無待批核項目</p>
     <div v-if="batchRejectModal||rejectId!=null" class="modal-overlay" @click.self="closeModal">
       <div class="modal">
-        <h3>退回原因</h3>
+        <h3>D00 請假單審核</h3>
         <textarea v-model="rejectReason" rows="3" placeholder="請輸入退回原因（選填）"/>
         <div class="modal-actions">
           <button @click="doReject">確認退回</button>
@@ -40,6 +40,7 @@
   </div>
 </template>
 <script setup lang="ts">
+// 功能編號：D00 請假單審核
 import { ref, onMounted } from 'vue'
 import { approvalsApi } from '@/api/approvals'
 const rows = ref<Record<string, unknown>[]>([])

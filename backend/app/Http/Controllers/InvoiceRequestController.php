@@ -4,6 +4,12 @@ use App\Models\InvoiceRequest;
 use App\Models\Staff;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+/**
+ * A05 請款申請
+ *
+ * 功能編號：A05
+ * 對應文件：docs/sdd/a05-invoice-request-sdd.md
+ */
 class InvoiceRequestController extends Controller {
     private function myStaffId(Request $r): ?int { return Staff::where('user_id',$r->user()->id)->value('id'); }
     public function index(Request $request): JsonResponse {

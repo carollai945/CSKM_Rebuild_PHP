@@ -1,6 +1,6 @@
 <template>
   <div class="page">
-    <h2>修改密碼</h2>
+    <h2>A01 修改密碼</h2>
     <div class="card">
       <form @submit.prevent="submit">
         <div class="form-group"><label>目前密碼</label><input type="password" v-model="form.current_password" required/></div>
@@ -14,6 +14,7 @@
   </div>
 </template>
 <script setup lang="ts">
+// 功能編號：A01 修改密碼
 import { ref, onMounted } from 'vue'
 import { personalDataApi } from '@/api/personalData'
 const form = ref({ current_password: '', new_password: '', new_password_confirmation: '' })

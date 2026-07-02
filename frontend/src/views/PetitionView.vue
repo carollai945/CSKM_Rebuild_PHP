@@ -1,6 +1,6 @@
 <template>
   <div class="page">
-    <h2>簽呈申請</h2>
+    <h2>A04 簽呈申請</h2>
     <div class="page-header"><div></div><button @click="showForm=true">新增簽呈</button></div>
     <div v-if="loading">載入中...</div>
     <table v-else>
@@ -13,7 +13,7 @@
       </tbody>
     </table>
     <div v-if="showForm" class="modal-overlay" @click.self="showForm=false">
-      <div class="modal"><h3>新增簽呈</h3>
+      <div class="modal"><h3>A04 簽呈申請</h3>
         <div><label>標題</label><input v-model="form.title"/></div>
         <div><label>內容</label><textarea v-model="form.content" rows="4"/></div>
         <div class="modal-actions"><button @click="save">送出</button><button @click="showForm=false">取消</button></div>
@@ -22,6 +22,7 @@
   </div>
 </template>
 <script setup lang="ts">
+// 功能編號：A04 簽呈申請
 import { ref, onMounted } from 'vue'
 import { petitionsApi } from '@/api/applications'
 const rows = ref<Record<string,unknown>[]>([])

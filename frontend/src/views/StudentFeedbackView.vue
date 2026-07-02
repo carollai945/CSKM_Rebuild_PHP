@@ -1,7 +1,7 @@
 <template>
   <div class="page">
     <div class="page-header">
-      <h2>學員意見管理</h2>
+      <h2>B02 課程業績</h2>
       <button @click="showForm = true">新增</button>
     </div>
     <div v-if="loading" class="loading">載入中...</div>
@@ -26,7 +26,7 @@
     </table>
     <div v-if="showForm" class="modal-overlay" @click.self="showForm = false">
       <div class="modal">
-        <h3>{{ editId ? '編輯' : '新增' }}學員意見管理</h3>
+        <h3>B02 課程業績</h3>
         <form @submit.prevent="save">
           <div><label>學員ID</label><input v-model="form.student_id" placeholder="學員ID" /></div>
           <div><label>類別</label><input v-model="form.category" placeholder="類別" /></div>
@@ -41,6 +41,7 @@
   </div>
 </template>
 <script setup lang="ts">
+// 功能編號：B02 課程業績
 import { ref, onMounted } from 'vue'
 import { studentFeedbacksApi } from '@/api/studentFeedbacks'
 const rows = ref<Record<string,unknown>[]>([])

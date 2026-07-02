@@ -8,6 +8,12 @@ use App\Models\Classroom;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * C03 教室管理
+ *
+ * 功能編號：C03
+ * 對應文件：docs/sdd/c03-classroom-sdd.md
+ */
 class ClassroomController extends Controller
 {
     public function index(Request $request): JsonResponse

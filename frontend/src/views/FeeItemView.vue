@@ -1,7 +1,7 @@
 <template>
   <div class="page">
     <div class="page-header">
-      <h2>費用項目設定</h2>
+      <h2>C05 費用項目設定</h2>
       <button @click="showForm = true">新增</button>
     </div>
     <div v-if="loading" class="loading">載入中...</div>
@@ -26,7 +26,7 @@
     </table>
     <div v-if="showForm" class="modal-overlay" @click.self="showForm = false">
       <div class="modal">
-        <h3>{{ editId ? '編輯' : '新增' }}費用項目設定</h3>
+        <h3>C05 費用項目設定</h3>
         <form @submit.prevent="save">
           <div><label>名稱</label><input v-model="form.name" placeholder="名稱" /></div>
           <div><label>金額</label><input v-model="form.amount" placeholder="金額" /></div>
@@ -40,6 +40,7 @@
   </div>
 </template>
 <script setup lang="ts">
+// 功能編號：C05 費用項目設定
 import { ref, onMounted } from 'vue'
 import { feeItemsApi } from '@/api/feeItems'
 const rows = ref<Record<string,unknown>[]>([])

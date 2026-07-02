@@ -1,6 +1,6 @@
 <template>
   <div class="page">
-    <h2>個人報表</h2>
+    <h2>A02 個人報表</h2>
     <div class="page-header">
       <div></div><button @click="showForm=true">新增報表</button>
     </div>
@@ -15,7 +15,7 @@
       </tbody>
     </table>
     <div v-if="showForm" class="modal-overlay" @click.self="showForm=false">
-      <div class="modal"><h3>新增報表</h3>
+      <div class="modal"><h3>A02 個人報表</h3>
         <div><label>類型</label><select v-model="form.report_type"><option value="DAILY">日報</option><option value="WEEKLY">週報</option></select></div>
         <div><label>日期</label><input type="date" v-model="form.report_date"/></div>
         <div><label>內容</label><textarea v-model="form.content" rows="4"/></div>
@@ -25,6 +25,7 @@
   </div>
 </template>
 <script setup lang="ts">
+// 功能編號：A02 個人報表
 import { ref, onMounted } from 'vue'
 import { reportsApi } from '@/api/reports'
 const rows = ref<Record<string,unknown>[]>([])

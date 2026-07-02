@@ -1,6 +1,6 @@
 <template>
   <div class="page">
-    <h2>請款單申請</h2>
+    <h2>A05 請款申請</h2>
     <div class="page-header"><div></div><button @click="showForm=true">新增請款單</button></div>
     <div v-if="loading">載入中...</div>
     <table v-else>
@@ -13,7 +13,7 @@
       </tbody>
     </table>
     <div v-if="showForm" class="modal-overlay" @click.self="showForm=false">
-      <div class="modal"><h3>新增請款單</h3>
+      <div class="modal"><h3>A05 請款申請</h3>
         <div><label>標題</label><input v-model="form.title"/></div>
         <div><label>金額</label><input type="number" v-model="form.amount"/></div>
         <div><label>說明</label><textarea v-model="form.description" rows="3"/></div>
@@ -23,6 +23,7 @@
   </div>
 </template>
 <script setup lang="ts">
+// 功能編號：A05 請款申請
 import { ref, onMounted } from 'vue'
 import { invoiceRequestsApi } from '@/api/applications'
 const rows = ref<Record<string,unknown>[]>([])

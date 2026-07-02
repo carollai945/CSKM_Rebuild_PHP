@@ -8,6 +8,12 @@ use App\Models\FeeItem;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * C05 費用項目設定
+ *
+ * 功能編號：C05
+ * 對應文件：docs/sdd/c05-fee-item-sdd.md
+ */
 class FeeItemController extends Controller
 {
     public function index(Request $request): JsonResponse

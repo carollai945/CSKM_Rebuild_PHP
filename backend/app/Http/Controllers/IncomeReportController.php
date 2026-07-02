@@ -4,6 +4,12 @@ use App\Models\Payment;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+/**
+ * E01 收入報表
+ *
+ * 功能編號：E01
+ * 對應文件：docs/sdd/e01-income-report-sdd.md
+ */
 class IncomeReportController extends Controller {
     public function index(Request $request): JsonResponse {
         Gate::authorize('is-finance');

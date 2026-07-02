@@ -8,6 +8,12 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
+/**
+ * F01 部門管理
+ *
+ * 功能編號：F01
+ * 對應文件：docs/sdd/f01-department-sdd.md
+ */
 class DepartmentController extends Controller
 {
     public function index(): JsonResponse

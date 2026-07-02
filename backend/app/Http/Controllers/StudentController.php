@@ -9,6 +9,12 @@ use App\Models\StudentCourse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * C02 學生管理 / C046 學員明細
+ *
+ * 功能編號：C02
+ * 對應文件：docs/sdd/c02-student-sdd.md
+ */
 class StudentController extends Controller
 {
     public function index(Request $request): JsonResponse

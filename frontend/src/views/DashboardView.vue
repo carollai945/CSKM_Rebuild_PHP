@@ -43,6 +43,7 @@
   </div>
 </template>
 <script setup lang="ts">
+// 功能編號：訊息中心 訊息中心 Dashboard
 import { ref, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import api from '@/api/axios'

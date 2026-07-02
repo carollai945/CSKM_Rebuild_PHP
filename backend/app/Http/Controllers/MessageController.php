@@ -10,6 +10,12 @@ use App\Models\InvoiceRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * 訊息中心 訊息中心 Dashboard
+ *
+ * 功能編號：訊息中心
+ * 對應文件：docs/sdd/a00-personal-data-sdd.md
+ */
 class MessageController extends Controller
 {
     public function index(Request $request): JsonResponse
