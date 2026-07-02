@@ -55,6 +55,14 @@ async function load() { loading.value = true; const r = await studentsApi.list()
 function edit(row: Record<string,unknown>) { editId.value = row.id as number; form.value = {...row}; showForm.value = true }
 async function save() { if (editId.value) await studentsApi.update(editId.value, form.value); else await studentsApi.create(form.value); showForm.value = false; editId.value = null; form.value = {}; load() }
 async function remove(id: number) { if (confirm('確認刪除?')) { await studentsApi.delete(id); load() } }
+async function exportExcel() {
+  const params = new URLSearchParams()
+  const r = await import('@/api/axios').then(m => m.default.get('/students/export', { params, responseType: 'blob' }))
+  const url = URL.createObjectURL(new Blob([r.data]))
+  const a = document.createElement('a'); a.href = url
+  a.download = '學生資料_' + new Date().toISOString().slice(0,10) + '.xlsx'
+  a.click(); URL.revokeObjectURL(url)
+}
 onMounted(load)
 </script>
 <style scoped>

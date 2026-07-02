@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreStudentRequest;
 use App\Http\Requests\UpdateStudentRequest;
 use App\Models\Student;
+use Illuminate\Support\Facades\Gate;
 use App\Models\StudentCourse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use OpenSpout\Writer\XLSX\Writer;
+use OpenSpout\Common\Entity\Row;
 
 /**
  * C02 學生管理 / C046 學員明細
@@ -92,4 +95,44 @@ class StudentController extends Controller
 
         return response()->json(['data' => $student->studentCourses()->with('course')->get()]);
     }
+
+    public function export(Request $request): \Symfony\Component\HttpFoundation\StreamedResponse
+    {
+        Gate::authorize('management');
+        $query = Student::with('region');
+        if ($request->filled('region_id')) {
+            $query->where('region_id', $request->region_id);
+        }
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+        if ($request->filled('keyword')) {
+            $kw = '%' . $request->keyword . '%';
+            $query->where(function ($q) use ($kw) {
+                $q->where('name', 'like', $kw)->orWhere('phone', 'like', $kw)->orWhere('email', 'like', $kw);
+            });
+        }
+        $students = $query->get();
+
+        return response()->streamDownload(function () use ($students) {
+            $writer = new Writer();
+            $writer->openToFile('php://output');
+            $writer->addRow(Row::fromValues(['學號', '姓名', '電話', 'Email', '區域', '狀態', '入學日期']));
+            foreach ($students as $s) {
+                $writer->addRow(Row::fromValues([
+                    (string)$s->id,
+                    $s->name ?? '',
+                    $s->phone ?? '',
+                    $s->email ?? '',
+                    $s->region?->name ?? '',
+                    $s->status ?? '',
+                    $s->enrolled_at ? $s->enrolled_at->format('Y-m-d') : '',
+                ]));
+            }
+            $writer->close();
+        }, '學生資料_' . now()->format('Ymd') . '.xlsx', [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ]);
+    }
+
 }
