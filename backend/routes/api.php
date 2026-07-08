@@ -156,6 +156,7 @@ Route::prefix('v1')->group(function () {
         Route::patch('/students/{student}/advisor', [StudentController::class, 'updateAdvisor']);
         Route::get('/students/{student}/courses', [StudentController::class, 'getCourses']);
         Route::put('/students/{student}/courses', [StudentController::class, 'updateCourses']);
+        Route::get('/students/{student}/payments', [PaymentController::class, 'getStudentPayments']);
 
         Route::get('/student-services', [StudentServiceController::class, 'index']);
         Route::post('/student-services', [StudentServiceController::class, 'store']);

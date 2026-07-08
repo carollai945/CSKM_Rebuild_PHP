@@ -2,6 +2,7 @@
 namespace App\Http\Controllers;
 use App\Models\Payment;
 use App\Models\Staff;
+use App\Models\Student;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -60,5 +61,13 @@ class PaymentController extends Controller {
         $validated = $request->validate(['note'=>'nullable|string']);
         $payment->update(['status'=>'REJECTED','note'=>$validated['note'] ?? $payment->note]);
         return response()->json(['data' => $payment->fresh()]);
+    }
+
+    public function getStudentPayments(Student $student): JsonResponse {
+        $payments = Payment::with(['student','feeItem'])
+            ->where('student_id', $student->id)
+            ->latest()
+            ->paginate(20);
+        return response()->json(['data' => $payments]);
     }
 }
