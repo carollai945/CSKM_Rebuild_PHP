@@ -151,6 +151,9 @@ Route::prefix('v1')->group(function () {
         Route::post('/students/assign', [StudentAssignmentController::class, 'batchAssign']);
         Route::get('/students', [StudentController::class, 'index']);
         Route::post('/students', [StudentController::class, 'store']);
+        Route::middleware('role:admin,ceo')->group(function () {
+            Route::get('/students/export', [StudentController::class, 'export']);
+        });
         Route::get('/students/{student}', [StudentController::class, 'show']);
         Route::put('/students/{student}', [StudentController::class, 'update']);
         Route::patch('/students/{student}/advisor', [StudentController::class, 'updateAdvisor']);

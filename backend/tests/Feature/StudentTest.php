@@ -133,6 +133,26 @@ class StudentTest extends TestCase
         $this->assertDatabaseHas('student_courses', ['student_id' => $student->id, 'course_id' => $course->id]);
     }
 
+    public function test_admin_can_export_students_to_excel(): void
+    {
+        Sanctum::actingAs($this->adminUser());
+        $this->makeStudent(['name' => '匯出測試']);
+
+        $response = $this->get('/api/v1/students/export');
+
+        $response->assertStatus(200);
+        $response->assertHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    }
+
+    public function test_non_admin_cannot_export_students(): void
+    {
+        Sanctum::actingAs($this->staffUser());
+
+        $response = $this->getJson('/api/v1/students/export');
+
+        $response->assertStatus(403);
+    }
+
     public function test_unauthenticated_cannot_access_students(): void
     {
         $response = $this->getJson('/api/v1/students');
