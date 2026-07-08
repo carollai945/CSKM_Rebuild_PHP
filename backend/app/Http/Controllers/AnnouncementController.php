@@ -32,4 +32,15 @@ class AnnouncementController extends Controller {
         $announcement->delete();
         return response()->json(null,204);
     }
+    public function submit(Request $request, Announcement $announcement): JsonResponse {
+        abort_if($announcement->status!=='DRAFT',422,'只有草稿狀態的公告可以送審。');
+        $announcement->update(['status'=>'PENDING']);
+        return response()->json(['data'=>$announcement->fresh()]);
+    }
+    public function cancel(Request $request, Announcement $announcement): JsonResponse {
+        abort_if($announcement->staff_id!==$this->myStaffId($request),403,'無權限取消此公告。');
+        abort_if($announcement->status!=='PENDING',422,'只有待審狀態的公告可以取消。');
+        $announcement->update(['status'=>'CANCELLED']);
+        return response()->json(['data'=>$announcement->fresh()]);
+    }
 }

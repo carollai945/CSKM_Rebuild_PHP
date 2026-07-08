@@ -31,13 +31,13 @@ class LeaveRequestTest extends TestCase {
         ])->assertStatus(201)->assertJsonPath('data.leave_type','ANNUAL');
     }
 
-    public function test_can_update_pending_leave_request(): void {
+    public function test_can_update_draft_leave_request(): void {
         $lr = LeaveRequest::create(['staff_id'=>$this->staff->id,'leave_type'=>'ANNUAL','start_at'=>'2026-07-10 09:00:00','end_at'=>'2026-07-10 18:00:00']);
         $this->putJson("/api/v1/applications/leave-requests/{$lr->id}",['leave_type'=>'SICK'])
             ->assertStatus(200)->assertJsonPath('data.leave_type','SICK');
     }
 
-    public function test_can_cancel_pending_leave_request(): void {
+    public function test_can_delete_draft_leave_request(): void {
         $lr = LeaveRequest::create(['staff_id'=>$this->staff->id,'leave_type'=>'ANNUAL','start_at'=>'2026-07-10 09:00:00','end_at'=>'2026-07-10 18:00:00']);
         $this->deleteJson("/api/v1/applications/leave-requests/{$lr->id}")->assertStatus(204);
     }
@@ -45,6 +45,30 @@ class LeaveRequestTest extends TestCase {
     public function test_cannot_update_approved_leave_request(): void {
         $lr = LeaveRequest::create(['staff_id'=>$this->staff->id,'leave_type'=>'ANNUAL','start_at'=>'2026-07-10 09:00:00','end_at'=>'2026-07-10 18:00:00','status'=>'APPROVED']);
         $this->putJson("/api/v1/applications/leave-requests/{$lr->id}",['leave_type'=>'SICK'])->assertStatus(422);
+    }
+
+    public function test_can_submit_draft_leave_request(): void {
+        $lr = LeaveRequest::create(['staff_id'=>$this->staff->id,'leave_type'=>'ANNUAL','start_at'=>'2026-07-10 09:00:00','end_at'=>'2026-07-10 18:00:00']);
+        $this->postJson("/api/v1/applications/leave-requests/{$lr->id}/submit")
+            ->assertStatus(200)->assertJsonPath('data.status','PENDING');
+    }
+
+    public function test_cannot_submit_pending_leave_request(): void {
+        $lr = LeaveRequest::create(['staff_id'=>$this->staff->id,'leave_type'=>'ANNUAL','start_at'=>'2026-07-10 09:00:00','end_at'=>'2026-07-10 18:00:00','status'=>'PENDING']);
+        $this->postJson("/api/v1/applications/leave-requests/{$lr->id}/submit")->assertStatus(422);
+    }
+
+    public function test_can_cancel_pending_leave_request(): void {
+        $lr = LeaveRequest::create(['staff_id'=>$this->staff->id,'leave_type'=>'ANNUAL','start_at'=>'2026-07-10 09:00:00','end_at'=>'2026-07-10 18:00:00','status'=>'PENDING']);
+        $this->postJson("/api/v1/applications/leave-requests/{$lr->id}/cancel")
+            ->assertStatus(200)->assertJsonPath('data.status','CANCELLED');
+    }
+
+    public function test_other_user_cannot_cancel_leave_request(): void {
+        $otherUser = User::factory()->create(['role' => Role::Staff]);
+        $otherStaff = Staff::factory()->create(['user_id' => $otherUser->id]);
+        $lr = LeaveRequest::create(['staff_id'=>$otherStaff->id,'leave_type'=>'ANNUAL','start_at'=>'2026-07-10 09:00:00','end_at'=>'2026-07-10 18:00:00','status'=>'PENDING']);
+        $this->postJson("/api/v1/applications/leave-requests/{$lr->id}/cancel")->assertStatus(403);
     }
 
     public function test_unauthenticated_cannot_access(): void {

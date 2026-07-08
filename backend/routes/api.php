@@ -176,24 +176,32 @@ Route::prefix('v1')->group(function () {
             Route::get('/leave-requests/{leaveRequest}', [LeaveRequestController::class, 'show']);
             Route::put('/leave-requests/{leaveRequest}', [LeaveRequestController::class, 'update']);
             Route::delete('/leave-requests/{leaveRequest}', [LeaveRequestController::class, 'destroy']);
+            Route::post('/leave-requests/{leaveRequest}/submit', [LeaveRequestController::class, 'submit']);
+            Route::post('/leave-requests/{leaveRequest}/cancel', [LeaveRequestController::class, 'cancel']);
 
             Route::get('/petitions', [PetitionController::class, 'index']);
             Route::post('/petitions', [PetitionController::class, 'store']);
             Route::get('/petitions/{petition}', [PetitionController::class, 'show']);
             Route::put('/petitions/{petition}', [PetitionController::class, 'update']);
             Route::delete('/petitions/{petition}', [PetitionController::class, 'destroy']);
+            Route::post('/petitions/{petition}/submit', [PetitionController::class, 'submit']);
+            Route::post('/petitions/{petition}/cancel', [PetitionController::class, 'cancel']);
 
             Route::get('/invoice-requests', [InvoiceRequestController::class, 'index']);
             Route::post('/invoice-requests', [InvoiceRequestController::class, 'store']);
             Route::get('/invoice-requests/{invoiceRequest}', [InvoiceRequestController::class, 'show']);
             Route::put('/invoice-requests/{invoiceRequest}', [InvoiceRequestController::class, 'update']);
             Route::delete('/invoice-requests/{invoiceRequest}', [InvoiceRequestController::class, 'destroy']);
+            Route::post('/invoice-requests/{invoiceRequest}/submit', [InvoiceRequestController::class, 'submit']);
+            Route::post('/invoice-requests/{invoiceRequest}/cancel', [InvoiceRequestController::class, 'cancel']);
 
             Route::get('/announcements', [AnnouncementController::class, 'index']);
             Route::post('/announcements', [AnnouncementController::class, 'store']);
             Route::get('/announcements/{announcement}', [AnnouncementController::class, 'show']);
             Route::put('/announcements/{announcement}', [AnnouncementController::class, 'update']);
             Route::delete('/announcements/{announcement}', [AnnouncementController::class, 'destroy']);
+            Route::post('/announcements/{announcement}/submit', [AnnouncementController::class, 'submit']);
+            Route::post('/announcements/{announcement}/cancel', [AnnouncementController::class, 'cancel']);
         });
 
         Route::get('/payments', [PaymentController::class, 'index']);
