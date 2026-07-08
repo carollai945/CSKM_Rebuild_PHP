@@ -64,11 +64,16 @@ import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { getMessages } from '@/api/messages'
+import { usePermissionStore } from '@/stores/permission'
+import { useNotificationStore } from '@/stores/notification'
 import { useRouter } from 'vue-router'
 
 const READ_KEY = 'message_read_ids'
 const auth = useAuthStore()
+const permission = usePermissionStore()
+const notification = useNotificationStore()
 const router = useRouter()
+const canAccess = (module: string) => permission.canAccess(module)
 const unreadCount = ref(0)
 
 function getReadIds() {
@@ -91,7 +96,12 @@ function onReadUpdated() {
   loadUnreadCount()
 }
 
-async function logout() { await auth.logout(); router.push('/login') }
+async function logout() {
+  permission.reset()
+  notification.reset()
+  await auth.logout()
+  router.push('/login')
+}
 
 onMounted(() => {
   loadUnreadCount()
