@@ -33,5 +33,25 @@ class AnnouncementTest extends TestCase {
         $a=Announcement::create(['staff_id'=>$this->staff->id,'title'=>'del']);
         $this->deleteJson("/api/v1/applications/announcements/{$a->id}")->assertStatus(204);
     }
+    public function test_can_submit_draft_announcement(): void {
+        $a=Announcement::create(['staff_id'=>$this->staff->id,'title'=>'test']);
+        $this->postJson("/api/v1/applications/announcements/{$a->id}/submit")
+            ->assertStatus(200)->assertJsonPath('data.status','PENDING');
+    }
+    public function test_cannot_submit_pending_announcement(): void {
+        $a=Announcement::create(['staff_id'=>$this->staff->id,'title'=>'test','status'=>'PENDING']);
+        $this->postJson("/api/v1/applications/announcements/{$a->id}/submit")->assertStatus(422);
+    }
+    public function test_can_cancel_pending_announcement(): void {
+        $a=Announcement::create(['staff_id'=>$this->staff->id,'title'=>'test','status'=>'PENDING']);
+        $this->postJson("/api/v1/applications/announcements/{$a->id}/cancel")
+            ->assertStatus(200)->assertJsonPath('data.status','CANCELLED');
+    }
+    public function test_other_user_cannot_cancel_announcement(): void {
+        $otherUser=User::factory()->create(['role'=>Role::Staff]);
+        $otherStaff=Staff::factory()->create(['user_id'=>$otherUser->id]);
+        $a=Announcement::create(['staff_id'=>$otherStaff->id,'title'=>'test','status'=>'PENDING']);
+        $this->postJson("/api/v1/applications/announcements/{$a->id}/cancel")->assertStatus(403);
+    }
     public function test_unauthenticated(): void { auth()->forgetGuards(); $this->getJson('/api/v1/applications/announcements')->assertStatus(401); }
 }

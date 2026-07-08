@@ -55,4 +55,24 @@ class PaymentTest extends TestCase {
         auth()->forgetGuards();
         $this->getJson('/api/v1/payments')->assertStatus(401);
     }
+
+    public function test_can_list_student_payments(): void {
+        Payment::create(['student_id'=>$this->student->id,'amount'=>1500]);
+        Payment::create(['student_id'=>$this->student->id,'amount'=>2000]);
+        $this->getJson("/api/v1/students/{$this->student->id}/payments")
+            ->assertStatus(200)
+            ->assertJsonStructure(['data'])
+            ->assertJsonPath('data.total', 2);
+    }
+
+    public function test_student_with_no_payments_returns_empty(): void {
+        $response = $this->getJson("/api/v1/students/{$this->student->id}/payments");
+        $response->assertStatus(200)
+            ->assertJsonPath('data.total', 0);
+    }
+
+    public function test_unauthenticated_cannot_access_student_payments(): void {
+        auth()->forgetGuards();
+        $this->getJson("/api/v1/students/{$this->student->id}/payments")->assertStatus(401);
+    }
 }
