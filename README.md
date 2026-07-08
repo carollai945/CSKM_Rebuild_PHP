@@ -29,3 +29,4 @@ CSKM 重建專案，目標技術為 **PHP 8.3 + Laravel 11 + Vue 3**，並採用
 7. 若 `backend/` 已加入 `composer.json`，則自動執行 `composer install && php artisan test`
 8. 若 `frontend/` 已加入 `package.json`，則自動執行前端 test / build
 9. Action 結束後會自動回寫 PR 內的 `CI Checklist（自動更新）` 區塊
+# retrigger CI
