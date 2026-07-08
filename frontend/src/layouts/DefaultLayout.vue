@@ -64,6 +64,7 @@
           <div class="nav-group">系統</div>
           <RouterLink to="/system/backup">💾 資料庫備份</RouterLink>
         </template>
+        <RouterLink to="/messages" class="message-link">✉️ 訊息中心<span v-if="notification.unreadCount > 0" class="badge">{{ notification.unreadCount }}</span></RouterLink>
         <a href="#" @click.prevent="logout">🚪 登出</a>
       </nav>
     </aside>
@@ -81,6 +82,7 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { usePermissionStore } from '@/stores/permission'
@@ -91,6 +93,7 @@ const permission = usePermissionStore()
 const notification = useNotificationStore()
 const router = useRouter()
 const canAccess = (module: string) => permission.canAccess(module)
+onMounted(() => notification.fetchMessages())
 async function logout() {
   permission.reset()
   notification.reset()
