@@ -17,6 +17,7 @@ class Lead extends Model
         'education_level',
         'education_other',
         'source_code',
+        'import_job_id',
         'region_id',
         'assigned_staff_id',
         'status',
@@ -26,6 +27,11 @@ class Lead extends Model
     public function region(): BelongsTo
     {
         return $this->belongsTo(Region::class);
+    }
+
+    public function importJob(): BelongsTo
+    {
+        return $this->belongsTo(ImportJob::class);
     }
 
     public function assignedStaff(): BelongsTo
