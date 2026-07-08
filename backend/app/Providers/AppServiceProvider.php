@@ -22,6 +22,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Gate::define('viewApiDocs', fn (?User $user = null) => app()->environment(['local', 'testing']));
+
         Gate::define('is-admin', fn (User $user) => $user->role === Role::Admin);
 
         Gate::define('is-ceo', fn (User $user) => $user->role === Role::CEO);
