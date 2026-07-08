@@ -17,6 +17,9 @@ use Illuminate\Support\Facades\Gate;
  */
 class AuthController extends Controller
 {
+    /**
+     * 驗證帳號密碼並簽發 Sanctum API Token。
+     */
     public function login(Request $request): JsonResponse
     {
         $request->validate([
@@ -40,6 +43,9 @@ class AuthController extends Controller
         ]);
     }
 
+    /**
+     * 撤銷目前登入裝置使用中的 API Token。
+     */
     public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()->delete();
@@ -47,11 +53,17 @@ class AuthController extends Controller
         return response()->json(['message' => 'Logged out successfully.']);
     }
 
+    /**
+     * 取得目前登入使用者資料。
+     */
     public function me(Request $request): JsonResponse
     {
         return response()->json($request->user());
     }
 
+    /**
+     * 由管理角色重設指定教職員的登入密碼。
+     */
     public function resetPassword(Request $request): JsonResponse
     {
         Gate::authorize('management');
