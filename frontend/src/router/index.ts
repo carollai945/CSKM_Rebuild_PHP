@@ -1,10 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { usePermissionStore } from '@/stores/permission'
+import { useNotificationStore } from '@/stores/notification'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     { path: '/login', name: 'login', component: () => import('@/views/LoginView.vue') },
+    { path: '/403', name: 'forbidden', component: () => import('@/views/ForbiddenView.vue') },
     {
       path: '/',
       component: () => import('@/layouts/DefaultLayout.vue'),
