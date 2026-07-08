@@ -38,3 +38,4 @@ CSKM 重建專案，目標技術為 **PHP 8.3 + Laravel 11 + Vue 3**，並採用
 - JSON：`/docs/api.json`
 
 本次文件設定聚焦於 `api/v1` 路由，因此認證、主檔與申請流程等主要 API 端點都會出現在文件中。
+# retrigger CI
