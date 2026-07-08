@@ -1,5 +1,6 @@
 <?php
 namespace App\Http\Controllers;
+use App\Models\ApprovalActionLog;
 use App\Models\InvoiceRequest;
 use App\Models\Staff;
 use Illuminate\Http\JsonResponse;
@@ -19,7 +20,9 @@ class InvoiceRequestController extends Controller {
     public function store(Request $request): JsonResponse {
         $v = $request->validate(['title'=>'required|string|max:200','amount'=>'required|numeric|min:0','description'=>'nullable|string']);
         $v['staff_id']=$this->myStaffId($request);
-        return response()->json(['data'=>InvoiceRequest::create($v)],201);
+        $invoiceRequest = InvoiceRequest::create($v);
+        ApprovalActionLog::create(['related_type'=>'invoice_request','related_id'=>$invoiceRequest->id,'actor_id'=>$request->user()->id,'action'=>'SUBMIT']);
+        return response()->json(['data'=>$invoiceRequest],201);
     }
     public function show(InvoiceRequest $invoiceRequest): JsonResponse { return response()->json(['data'=>$invoiceRequest->load('staff')]); }
     public function update(Request $request, InvoiceRequest $invoiceRequest): JsonResponse {
@@ -27,9 +30,10 @@ class InvoiceRequestController extends Controller {
         $invoiceRequest->update($request->validate(['title'=>'sometimes|required|string|max:200','amount'=>'sometimes|required|numeric|min:0','description'=>'nullable|string']));
         return response()->json(['data'=>$invoiceRequest->fresh()]);
     }
-    public function destroy(InvoiceRequest $invoiceRequest): JsonResponse {
+    public function destroy(Request $request, InvoiceRequest $invoiceRequest): JsonResponse {
         abort_if($invoiceRequest->status!=='PENDING',422,'只能取消待審中的請款單。');
         $invoiceRequest->update(['status'=>'CANCELLED']);
+        ApprovalActionLog::create(['related_type'=>'invoice_request','related_id'=>$invoiceRequest->id,'actor_id'=>$request->user()->id,'action'=>'CANCEL']);
         return response()->json(null,204);
     }
 }

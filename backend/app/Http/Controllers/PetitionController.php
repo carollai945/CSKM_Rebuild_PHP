@@ -1,5 +1,6 @@
 <?php
 namespace App\Http\Controllers;
+use App\Models\ApprovalActionLog;
 use App\Models\Petition;
 use App\Models\Staff;
 use Illuminate\Http\JsonResponse;
@@ -22,7 +23,9 @@ class PetitionController extends Controller {
     public function store(Request $request): JsonResponse {
         $v = $request->validate(['title'=>'required|string|max:200','content'=>'nullable|string']);
         $v['staff_id'] = $this->myStaffId($request);
-        return response()->json(['data'=>Petition::create($v)],201);
+        $petition = Petition::create($v);
+        ApprovalActionLog::create(['related_type'=>'petition','related_id'=>$petition->id,'actor_id'=>$request->user()->id,'action'=>'SUBMIT']);
+        return response()->json(['data'=>$petition],201);
     }
     public function show(Petition $petition): JsonResponse { return response()->json(['data'=>$petition->load(['staff','approver'])]); }
     public function update(Request $request, Petition $petition): JsonResponse {
@@ -30,9 +33,10 @@ class PetitionController extends Controller {
         $petition->update($request->validate(['title'=>'sometimes|required|string|max:200','content'=>'nullable|string']));
         return response()->json(['data'=>$petition->fresh()]);
     }
-    public function destroy(Petition $petition): JsonResponse {
+    public function destroy(Request $request, Petition $petition): JsonResponse {
         abort_if($petition->status!=='PENDING',422,'只能取消待審中的簽呈。');
         $petition->update(['status'=>'CANCELLED']);
+        ApprovalActionLog::create(['related_type'=>'petition','related_id'=>$petition->id,'actor_id'=>$request->user()->id,'action'=>'CANCEL']);
         return response()->json(null,204);
     }
 }

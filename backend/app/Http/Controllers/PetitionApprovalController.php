@@ -1,5 +1,6 @@
 <?php
 namespace App\Http\Controllers;
+use App\Models\ApprovalActionLog;
 use App\Models\Petition;
 use App\Models\Staff;
 use Illuminate\Http\JsonResponse;
@@ -20,12 +21,15 @@ class PetitionApprovalController extends Controller {
         Gate::authorize('management');
         abort_if($petition->status!=='PENDING',422,'只能核准待審中的簽呈。');
         $petition->update(['status'=>'APPROVED','approved_by'=>Staff::where('user_id',$request->user()->id)->value('id')]);
+        ApprovalActionLog::create(['related_type'=>'petition','related_id'=>$petition->id,'actor_id'=>$request->user()->id,'action'=>'APPROVE']);
         return response()->json(['data'=>$petition->fresh()]);
     }
     public function reject(Request $request, Petition $petition): JsonResponse {
         Gate::authorize('management');
         abort_if($petition->status!=='PENDING',422,'只能退回待審中的簽呈。');
-        $petition->update(['status'=>'REJECTED','reject_reason'=>$request->validate(['reject_reason'=>'nullable|string'])['reject_reason']??null]);
+        $rejectReason = $request->validate(['reject_reason'=>'nullable|string'])['reject_reason']??null;
+        $petition->update(['status'=>'REJECTED','reject_reason'=>$rejectReason]);
+        ApprovalActionLog::create(['related_type'=>'petition','related_id'=>$petition->id,'actor_id'=>$request->user()->id,'action'=>'REJECT','comment'=>$rejectReason]);
         return response()->json(['data'=>$petition->fresh()]);
     }
 
