@@ -64,7 +64,10 @@
           <div class="nav-group">系統</div>
           <RouterLink to="/system/backup">💾 資料庫備份</RouterLink>
         </template>
-        <RouterLink to="/messages" class="message-link">✉️ 訊息中心<span v-if="notification.unreadCount > 0" class="badge">{{ notification.unreadCount }}</span></RouterLink>
+        <RouterLink to="/messages" class="message-link">
+          <span>📨 訊息中心</span>
+          <span v-if="unreadCount > 0" class="badge">{{ unreadCount }}</span>
+        </RouterLink>
         <a href="#" @click.prevent="logout">🚪 登出</a>
       </nav>
     </aside>
@@ -81,13 +84,14 @@
   </div>
 </template>
 
+
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { getMessages } from '@/api/messages'
 import { usePermissionStore } from '@/stores/permission'
 import { useNotificationStore } from '@/stores/notification'
-import { getMessages } from '@/api/messages'
 import { useRouter } from 'vue-router'
 
 const READ_KEY = 'message_read_ids'
@@ -96,8 +100,27 @@ const permission = usePermissionStore()
 const notification = useNotificationStore()
 const router = useRouter()
 const canAccess = (module: string) => permission.canAccess(module)
+const unreadCount = ref(0)
 
-onMounted(() => notification.fetchMessages())
+function getReadIds() {
+  try {
+    const ids = JSON.parse(localStorage.getItem(READ_KEY) ?? '[]')
+    return new Set(Array.isArray(ids) ? ids.map((id) => Number(id)) : [])
+  } catch {
+    return new Set<number>()
+  }
+}
+
+async function loadUnreadCount() {
+  const response = await getMessages()
+  const rows = response.data?.data?.announcements ?? []
+  const readIds = getReadIds()
+  unreadCount.value = rows.filter((row: Record<string, unknown>) => !readIds.has(Number(row.id))).length
+}
+
+function onReadUpdated() {
+  loadUnreadCount()
+}
 
 async function logout() {
   permission.reset()
@@ -105,6 +128,15 @@ async function logout() {
   await auth.logout()
   router.push('/login')
 }
+
+onMounted(() => {
+  loadUnreadCount()
+  window.addEventListener('messages-read-updated', onReadUpdated)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('messages-read-updated', onReadUpdated)
+})
 </script>
 
 <style scoped>
@@ -113,11 +145,8 @@ async function logout() {
 .sidebar-title { font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 1rem; padding: .5rem 0; border-bottom: 1px solid #ffffff20; }
 .sidebar a { display: block; color: #ffffffa0; padding: .35rem .5rem; text-decoration: none; font-size: .875rem; }
 .sidebar a:hover, .sidebar a.router-link-active { color: #fff; background: #ffffff15; border-radius: 4px; }
+.message-link { display: flex !important; justify-content: space-between; align-items: center; }
+.badge { background: #ff4d4f; color: #fff; border-radius: 999px; font-size: .75rem; padding: 0 .4rem; min-width: 1.25rem; text-align: center; }
 .nav-group { color: #ffffff50; font-size: .7rem; text-transform: uppercase; margin: .75rem 0 .25rem; padding: 0 .5rem; }
 .content { flex: 1; padding: 1.5rem; background: #f0f2f5; overflow-y: auto; }
-.topbar { display: flex; justify-content: flex-end; align-items: center; gap: 1rem; margin-bottom: 1rem; }
-.user-info { font-size: .875rem; color: #595959; }
-.notification-bell { position: relative; font-size: 1.25rem; text-decoration: none; color: #595959; }
-.badge { position: absolute; top: -6px; right: -8px; background: #cf1322; color: #fff; font-size: .65rem; border-radius: 9999px; min-width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; padding: 0 3px; }
-.message-link { display: flex !important; justify-content: space-between; align-items: center; }
 </style>
