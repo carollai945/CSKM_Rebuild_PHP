@@ -10,7 +10,7 @@ return new class extends Migration {
             $table->string('title', 200);
             $table->decimal('amount', 10, 2);
             $table->text('description')->nullable();
-            $table->string('status', 20)->default('PENDING');
+            $table->string('status', 20)->default('DRAFT'); // DRAFT / PENDING / APPROVED / REJECTED / CANCELLED
             $table->foreignId('approved_by')->nullable()->constrained('staff')->nullOnDelete();
             $table->text('reject_reason')->nullable();
             $table->timestamps();

@@ -12,7 +12,7 @@ class LeaveApprovalTest extends TestCase {
     private function makeLeaveRequest(): LeaveRequest {
         $u = User::factory()->create(['role'=>Role::Staff]);
         $s = Staff::factory()->create(['user_id'=>$u->id]);
-        return LeaveRequest::create(['staff_id'=>$s->id,'leave_type'=>'ANNUAL','start_at'=>'2026-07-10 09:00:00','end_at'=>'2026-07-10 18:00:00']);
+        return LeaveRequest::create(['staff_id'=>$s->id,'leave_type'=>'ANNUAL','start_at'=>'2026-07-10 09:00:00','end_at'=>'2026-07-10 18:00:00','status'=>'PENDING']);
     }
     public function test_management_can_list_pending(): void {
         Sanctum::actingAs(User::factory()->create(['role'=>Role::Admin]));

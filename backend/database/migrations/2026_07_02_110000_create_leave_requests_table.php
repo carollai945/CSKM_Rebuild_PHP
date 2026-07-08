@@ -12,7 +12,7 @@ return new class extends Migration {
             $table->dateTime('start_at');
             $table->dateTime('end_at');
             $table->text('reason')->nullable();
-            $table->string('status', 20)->default('PENDING'); // PENDING / APPROVED / REJECTED / CANCELLED
+            $table->string('status', 20)->default('DRAFT'); // DRAFT / PENDING / APPROVED / REJECTED / CANCELLED
             $table->foreignId('approved_by')->nullable()->constrained('staff')->nullOnDelete();
             $table->text('reject_reason')->nullable();
             $table->timestamps();

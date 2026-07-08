@@ -22,6 +22,7 @@ class BatchApprovalTest extends TestCase
             'leave_type' => 'ANNUAL',
             'start_at'   => '2026-07-10 09:00:00',
             'end_at'     => '2026-07-10 18:00:00',
+            'status'     => 'PENDING',
         ]);
     }
 

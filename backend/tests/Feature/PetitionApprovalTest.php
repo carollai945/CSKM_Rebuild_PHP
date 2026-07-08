@@ -12,7 +12,7 @@ class PetitionApprovalTest extends TestCase {
     private function makePetition(): Petition {
         $u=User::factory()->create(['role'=>Role::Staff]);
         $s=Staff::factory()->create(['user_id'=>$u->id]);
-        return Petition::create(['staff_id'=>$s->id,'title'=>'test']);
+        return Petition::create(['staff_id'=>$s->id,'title'=>'test','status'=>'PENDING']);
     }
     public function test_management_can_list_pending(): void {
         Sanctum::actingAs(User::factory()->create(['role'=>Role::Admin])); $this->makePetition();
