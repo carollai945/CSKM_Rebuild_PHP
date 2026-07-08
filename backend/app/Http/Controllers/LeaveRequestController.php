@@ -1,5 +1,6 @@
 <?php
 namespace App\Http\Controllers;
+use App\Models\ApprovalActionLog;
 use App\Models\LeaveRequest;
 use App\Models\Staff;
 use Illuminate\Http\JsonResponse;
@@ -33,6 +34,7 @@ class LeaveRequestController extends Controller {
         ]);
         $validated['staff_id'] = $this->myStaffId($request);
         $lr = LeaveRequest::create($validated);
+        ApprovalActionLog::create(['related_type'=>'leave_request','related_id'=>$lr->id,'actor_id'=>$request->user()->id,'action'=>'SUBMIT']);
         return response()->json(['data' => $lr], 201);
     }
 
@@ -52,9 +54,15 @@ class LeaveRequestController extends Controller {
         return response()->json(['data' => $leaveRequest->fresh()]);
     }
 
-    public function destroy(LeaveRequest $leaveRequest): JsonResponse {
-        abort_if($leaveRequest->status !== 'DRAFT', 422, '只能刪除草稿狀態的請假單。');
-        $leaveRequest->delete();
+    public function destroy(Request $request, LeaveRequest $leaveRequest): JsonResponse {
+        if ($leaveRequest->status === 'PENDING') {
+            $leaveRequest->update(['status' => 'CANCELLED']);
+        } elseif ($leaveRequest->status === 'DRAFT') {
+            $leaveRequest->delete();
+        } else {
+            abort(422, '只能刪除草稿或取消待審的請假單。');
+        }
+        ApprovalActionLog::create(['related_type'=>'leave_request','related_id'=>$leaveRequest->id,'actor_id'=>$request->user()->id,'action'=>'CANCEL']);
         return response()->json(null, 204);
     }
 

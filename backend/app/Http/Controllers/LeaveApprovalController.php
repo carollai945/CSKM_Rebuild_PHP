@@ -1,5 +1,6 @@
 <?php
 namespace App\Http\Controllers;
+use App\Models\ApprovalActionLog;
 use App\Models\LeaveRequest;
 use App\Models\Staff;
 use Illuminate\Http\JsonResponse;
@@ -24,6 +25,7 @@ class LeaveApprovalController extends Controller {
         abort_if($leaveRequest->status!=='PENDING',422,'只能核准待審中的請假單。');
         $staffId = Staff::where('user_id',$request->user()->id)->value('id');
         $leaveRequest->update(['status'=>'APPROVED','approved_by'=>$staffId]);
+        ApprovalActionLog::create(['related_type'=>'leave_request','related_id'=>$leaveRequest->id,'actor_id'=>$request->user()->id,'action'=>'APPROVE']);
         return response()->json(['data'=>$leaveRequest->fresh()]);
     }
     public function reject(Request $request, LeaveRequest $leaveRequest): JsonResponse {
@@ -31,6 +33,7 @@ class LeaveApprovalController extends Controller {
         abort_if($leaveRequest->status!=='PENDING',422,'只能退回待審中的請假單。');
         $validated = $request->validate(['reject_reason'=>'nullable|string']);
         $leaveRequest->update(['status'=>'REJECTED','reject_reason'=>$validated['reject_reason']??null]);
+        ApprovalActionLog::create(['related_type'=>'leave_request','related_id'=>$leaveRequest->id,'actor_id'=>$request->user()->id,'action'=>'REJECT','comment'=>$validated['reject_reason']??null]);
         return response()->json(['data'=>$leaveRequest->fresh()]);
     }
 

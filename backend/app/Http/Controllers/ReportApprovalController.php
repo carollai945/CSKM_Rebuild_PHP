@@ -1,5 +1,6 @@
 <?php
 namespace App\Http\Controllers;
+use App\Models\ApprovalActionLog;
 use App\Models\Report;
 use App\Models\Staff;
 use Illuminate\Http\JsonResponse;
@@ -20,12 +21,15 @@ class ReportApprovalController extends Controller {
         Gate::authorize('management');
         abort_if($report->status!=='SUBMITTED',422,'只能核准已送審的報表。');
         $report->update(['status'=>'APPROVED']);
+        ApprovalActionLog::create(['related_type'=>'report','related_id'=>$report->id,'actor_id'=>$request->user()->id,'action'=>'APPROVE']);
         return response()->json(['data'=>$report->fresh()]);
     }
     public function reject(Request $request, Report $report): JsonResponse {
         Gate::authorize('management');
         abort_if($report->status!=='SUBMITTED',422,'只能退回已送審的報表。');
+        $rejectReason = $request->validate(['reject_reason'=>'nullable|string'])['reject_reason']??null;
         $report->update(['status'=>'REJECTED']);
+        ApprovalActionLog::create(['related_type'=>'report','related_id'=>$report->id,'actor_id'=>$request->user()->id,'action'=>'REJECT','comment'=>$rejectReason]);
         return response()->json(['data'=>$report->fresh()]);
     }
 
