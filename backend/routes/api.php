@@ -249,6 +249,7 @@ Route::prefix('v1')->group(function () {
         Route::get("/reimbursements/{reimbursement}", [ReimbursementController::class, "show"]);
         Route::post("/reimbursements/{reimbursement}/finance-confirm", [ReimbursementController::class, "financeConfirm"]);
         Route::post("/reimbursements/{reimbursement}/reject", [ReimbursementController::class, "reject"]);
+        Route::get('/system/import-jobs/{importJob}', [LeadImportController::class, 'show']);
         Route::get("/system/backup", [SystemBackupController::class, "index"]);
         Route::post("/system/backup", [SystemBackupController::class, "store"]);
 
