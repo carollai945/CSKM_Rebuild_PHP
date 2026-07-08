@@ -30,13 +30,7 @@ CSKM 重建專案，目標技術為 **PHP 8.3 + Laravel 11 + Vue 3**，並採用
 8. 若 `frontend/` 已加入 `package.json`，則自動執行前端 test / build
 9. Action 結束後會自動回寫 PR 內的 `CI Checklist（自動更新）` 區塊
 
-## API Documentation
+## Backend Queue Worker
 
-後端已整合 Laravel Scramble，可在啟動 `backend/` Laravel 服務後瀏覽即時 OpenAPI 文件：
-
-- UI：`/docs/api`
-- JSON：`/docs/api.json`
-
-本次文件設定聚焦於 `api/v1` 路由，因此認證、主檔與申請流程等主要 API 端點都會出現在文件中。
-# retrigger CI
-# ci retrigger
+- `backend/.env.example` 預設已使用 `QUEUE_CONNECTION=database`
+- 啟動 Laravel 佇列背景工作：`cd backend && php artisan queue:work`

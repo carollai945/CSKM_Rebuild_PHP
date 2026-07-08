@@ -1,5 +1,6 @@
 <?php
 namespace App\Http\Controllers;
+use App\Models\ApprovalActionLog;
 use App\Models\Petition;
 use App\Models\Staff;
 use Illuminate\Http\JsonResponse;
@@ -28,7 +29,9 @@ class PetitionController extends Controller {
     public function store(Request $request): JsonResponse {
         $v = $request->validate(['title'=>'required|string|max:200','content'=>'nullable|string']);
         $v['staff_id'] = $this->myStaffId($request);
-        return response()->json(['data'=>Petition::create($v)],201);
+        $petition = Petition::create($v);
+        ApprovalActionLog::create(['related_type'=>'petition','related_id'=>$petition->id,'actor_id'=>$request->user()->id,'action'=>'SUBMIT']);
+        return response()->json(['data'=>$petition],201);
     }
     /**
      * 檢視單筆簽呈申請與簽核資訊。
@@ -38,7 +41,7 @@ class PetitionController extends Controller {
      * 修改尚未簽核完成的簽呈申請單。
      */
     public function update(Request $request, Petition $petition): JsonResponse {
-        abort_if($petition->status!=='PENDING',422,'只能修改待審中的簽呈。');
+        abort_if($petition->status!=='DRAFT',422,'只能修改草稿狀態的簽呈。');
         $petition->update($request->validate(['title'=>'sometimes|required|string|max:200','content'=>'nullable|string']));
         return response()->json(['data'=>$petition->fresh()]);
     }
@@ -46,8 +49,19 @@ class PetitionController extends Controller {
      * 取消尚未簽核完成的簽呈申請單。
      */
     public function destroy(Petition $petition): JsonResponse {
-        abort_if($petition->status!=='PENDING',422,'只能取消待審中的簽呈。');
-        $petition->update(['status'=>'CANCELLED']);
+        abort_if($petition->status!=='DRAFT',422,'只能刪除草稿狀態的簽呈。');
+        $petition->delete();
         return response()->json(null,204);
+    }
+    public function submit(Request $request, Petition $petition): JsonResponse {
+        abort_if($petition->status!=='DRAFT',422,'只有草稿狀態的簽呈可以送審。');
+        $petition->update(['status'=>'PENDING']);
+        return response()->json(['data'=>$petition->fresh()]);
+    }
+    public function cancel(Request $request, Petition $petition): JsonResponse {
+        abort_if($petition->staff_id!==$this->myStaffId($request),403,'無權限取消此簽呈。');
+        abort_if($petition->status!=='PENDING',422,'只有待審狀態的簽呈可以取消。');
+        $petition->update(['status'=>'CANCELLED']);
+        return response()->json(['data'=>$petition->fresh()]);
     }
 }

@@ -222,6 +222,8 @@ jobs:
           in_source_documents = False
           source_paths = []
 
+          import re
+
           for line in lines:
               if line.strip() == "## Source Documents":
                   in_source_documents = True
@@ -231,15 +233,22 @@ jobs:
               if in_source_documents:
                   stripped = line.strip()
                   if stripped.startswith("- "):
-                      path = stripped[2:].strip().strip("`")
-                      if path:
+                      backtick_match = re.search(r'`([^`]+)`', stripped)
+                      if backtick_match:
+                          path = backtick_match.group(1).strip()
+                      else:
+                          path = stripped[2:].strip().split()[0].strip("`").strip()
+                      if path and not path.startswith("#") and not path.startswith("http"):
                           source_paths.append(path)
 
           if not source_paths:
               print("No source document paths were listed in the PR body.")
               sys.exit(1)
 
-          missing_source_paths = [path for path in source_paths if not (repo / path).exists()]
+          missing_source_paths = [
+              path for path in source_paths
+              if not (repo / path).exists() and not (repo / path.rstrip("/")).exists()
+          ]
           if missing_source_paths:
               print("PR references source documents that do not exist:")
               for path in missing_source_paths:

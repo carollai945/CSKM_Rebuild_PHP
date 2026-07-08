@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Lead extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'name',
         'gender',
@@ -17,6 +20,7 @@ class Lead extends Model
         'education_level',
         'education_other',
         'source_code',
+        'import_job_id',
         'region_id',
         'assigned_staff_id',
         'status',
@@ -26,6 +30,11 @@ class Lead extends Model
     public function region(): BelongsTo
     {
         return $this->belongsTo(Region::class);
+    }
+
+    public function importJob(): BelongsTo
+    {
+        return $this->belongsTo(ImportJob::class);
     }
 
     public function assignedStaff(): BelongsTo

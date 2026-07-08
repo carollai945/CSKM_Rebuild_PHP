@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 use App\Models\Announcement;
+use App\Models\ApprovalActionLog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -15,16 +16,19 @@ class AnnouncementApprovalController extends Controller {
         Gate::authorize('management');
         return response()->json(['data'=>Announcement::with('staff')->where('status','PENDING_APPROVAL')->latest()->paginate(20)]);
     }
-    public function approve(Announcement $announcement): JsonResponse {
+    public function approve(Request $request, Announcement $announcement): JsonResponse {
         Gate::authorize('management');
         abort_if($announcement->status!=='PENDING_APPROVAL',422,'只能核准待審公告。');
         $announcement->update(['status'=>'PUBLISHED']);
+        ApprovalActionLog::create(['related_type'=>'announcement','related_id'=>$announcement->id,'actor_id'=>$request->user()->id,'action'=>'APPROVE']);
         return response()->json(['data'=>$announcement->fresh()]);
     }
     public function reject(Request $request, Announcement $announcement): JsonResponse {
         Gate::authorize('management');
         abort_if($announcement->status!=='PENDING_APPROVAL',422,'只能退回待審公告。');
+        $rejectReason = $request->validate(['reject_reason'=>'nullable|string'])['reject_reason']??null;
         $announcement->update(['status'=>'DRAFT']);
+        ApprovalActionLog::create(['related_type'=>'announcement','related_id'=>$announcement->id,'actor_id'=>$request->user()->id,'action'=>'REJECT','comment'=>$rejectReason]);
         return response()->json(['data'=>$announcement->fresh()]);
     }
 

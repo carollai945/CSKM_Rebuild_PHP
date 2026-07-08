@@ -1,5 +1,6 @@
 <?php
 namespace App\Http\Controllers;
+use App\Models\ApprovalActionLog;
 use App\Models\Report;
 use App\Models\Staff;
 use Illuminate\Http\JsonResponse;
@@ -48,9 +49,10 @@ class ReportController extends Controller {
         return response()->json(['data' => $report->fresh()]);
     }
 
-    public function submit(Report $report): JsonResponse {
+    public function submit(Request $request, Report $report): JsonResponse {
         abort_if($report->status !== 'DRAFT', 422, '只能送審草稿狀態的報表。');
         $report->update(['status' => 'SUBMITTED']);
+        ApprovalActionLog::create(['related_type'=>'report','related_id'=>$report->id,'actor_id'=>$request->user()->id,'action'=>'SUBMIT']);
         return response()->json(['data' => $report->fresh()]);
     }
 }
