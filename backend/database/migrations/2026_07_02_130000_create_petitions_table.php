@@ -10,7 +10,7 @@ return new class extends Migration {
             $table->foreignId('staff_id')->constrained('staff')->cascadeOnDelete();
             $table->string('title', 200);
             $table->text('content')->nullable();
-            $table->string('status', 20)->default('PENDING');
+            $table->string('status', 20)->default('DRAFT'); // DRAFT / PENDING / APPROVED / REJECTED / CANCELLED
             $table->foreignId('approved_by')->nullable()->constrained('staff')->nullOnDelete();
             $table->text('reject_reason')->nullable();
             $table->timestamps();

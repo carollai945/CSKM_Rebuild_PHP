@@ -41,7 +41,7 @@ class LeaveRequestController extends Controller {
     }
 
     public function update(Request $request, LeaveRequest $leaveRequest): JsonResponse {
-        abort_if($leaveRequest->status !== 'PENDING', 422, '只能修改待審中的請假單。');
+        abort_if($leaveRequest->status !== 'DRAFT', 422, '只能修改草稿狀態的請假單。');
         $validated = $request->validate([
             'leave_type' => 'sometimes|required|string|max:30',
             'start_at'   => 'sometimes|required|date',
@@ -53,8 +53,22 @@ class LeaveRequestController extends Controller {
     }
 
     public function destroy(LeaveRequest $leaveRequest): JsonResponse {
-        abort_if($leaveRequest->status !== 'PENDING', 422, '只能取消待審中的請假單。');
-        $leaveRequest->update(['status' => 'CANCELLED']);
+        abort_if($leaveRequest->status !== 'DRAFT', 422, '只能刪除草稿狀態的請假單。');
+        $leaveRequest->delete();
         return response()->json(null, 204);
+    }
+
+    public function submit(Request $request, LeaveRequest $leaveRequest): JsonResponse {
+        abort_if($leaveRequest->status !== 'DRAFT', 422, '只有草稿狀態的請假單可以送審。');
+        $leaveRequest->update(['status' => 'PENDING']);
+        return response()->json(['data' => $leaveRequest->fresh()]);
+    }
+
+    public function cancel(Request $request, LeaveRequest $leaveRequest): JsonResponse {
+        $staffId = $this->myStaffId($request);
+        abort_if($leaveRequest->staff_id !== $staffId, 403, '無權限取消此請假單。');
+        abort_if($leaveRequest->status !== 'PENDING', 422, '只有待審狀態的請假單可以取消。');
+        $leaveRequest->update(['status' => 'CANCELLED']);
+        return response()->json(['data' => $leaveRequest->fresh()]);
     }
 }
