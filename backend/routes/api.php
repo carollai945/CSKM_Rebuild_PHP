@@ -31,6 +31,7 @@ use App\Http\Controllers\PetitionApprovalController;
 use App\Http\Controllers\AnnouncementApprovalController;
 use App\Http\Controllers\ReportApprovalController;
 use App\Http\Controllers\ReimbursementController;
+use App\Http\Controllers\FinanceReportController;
 use App\Http\Controllers\IncomeReportController;
 use App\Http\Controllers\SystemBackupController;
 use App\Http\Controllers\LeadImportController;
@@ -250,5 +251,10 @@ Route::prefix('v1')->group(function () {
         Route::post("/reimbursements/{reimbursement}/reject", [ReimbursementController::class, "reject"]);
         Route::get("/system/backup", [SystemBackupController::class, "index"]);
         Route::post("/system/backup", [SystemBackupController::class, "store"]);
+
+        Route::prefix('finance-reports')->group(function () {
+            Route::get('/invoices', [FinanceReportController::class, 'invoices']);
+            Route::get('/payments', [FinanceReportController::class, 'payments']);
+        });
     });
 });

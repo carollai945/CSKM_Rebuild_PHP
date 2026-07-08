@@ -39,5 +39,11 @@ class AppServiceProvider extends ServiceProvider
             Role::CEO,
             Role::RegMgr,
         ], strict: true));
+
+        Gate::define('is-finance-report', fn (User $user) => in_array($user->role, [
+            Role::Admin,
+            Role::CEO,
+            Role::Finance,
+        ], strict: true));
     }
 }
