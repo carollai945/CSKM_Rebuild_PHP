@@ -54,9 +54,14 @@ class LeaveRequestController extends Controller {
         return response()->json(['data' => $leaveRequest->fresh()]);
     }
 
-    public function destroy(LeaveRequest $leaveRequest): JsonResponse {
-        abort_if($leaveRequest->status !== 'DRAFT', 422, '只能刪除草稿狀態的請假單。');
-        $leaveRequest->delete();
+    public function destroy(Request $request, LeaveRequest $leaveRequest): JsonResponse {
+        if ($leaveRequest->status === 'PENDING') {
+            $leaveRequest->update(['status' => 'CANCELLED']);
+            ApprovalActionLog::create(['related_type'=>'leave_request','related_id'=>$leaveRequest->id,'actor_id'=>$request->user()->id,'action'=>'CANCEL']);
+        } else {
+            abort_if($leaveRequest->status !== 'DRAFT', 422, '只能刪除草稿或取消待審的請假單。');
+            $leaveRequest->delete();
+        }
         return response()->json(null, 204);
     }
 

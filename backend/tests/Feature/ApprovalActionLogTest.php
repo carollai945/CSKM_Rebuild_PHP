@@ -23,13 +23,13 @@ class ApprovalActionLogTest extends TestCase {
     private function makeLeaveRequest(): LeaveRequest {
         $u = User::factory()->create(['role' => Role::Staff]);
         $s = Staff::factory()->create(['user_id' => $u->id]);
-        return LeaveRequest::create(['staff_id' => $s->id, 'leave_type' => 'ANNUAL', 'start_at' => '2026-07-10 09:00:00', 'end_at' => '2026-07-10 18:00:00']);
+        return LeaveRequest::create(['staff_id' => $s->id, 'leave_type' => 'ANNUAL', 'start_at' => '2026-07-10 09:00:00', 'end_at' => '2026-07-10 18:00:00', 'status' => 'PENDING']);
     }
 
     private function makePetition(): Petition {
         $u = User::factory()->create(['role' => Role::Staff]);
         $s = Staff::factory()->create(['user_id' => $u->id]);
-        return Petition::create(['staff_id' => $s->id, 'title' => 'test petition']);
+        return Petition::create(['staff_id' => $s->id, 'title' => 'test petition', 'status' => 'PENDING']);
     }
 
     public function test_approve_leave_request_creates_log(): void {
