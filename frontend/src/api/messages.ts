@@ -32,3 +32,7 @@ export const messagesApi = {
   getMessages: () => api.get<ApiResponse<MessagesResponse>>('/messages'),
   markRead: (id: number) => api.patch<ApiResponse<MessageStatusResponse>>(`/messages/${id}/read`),
 }
+
+// Named export for backwards compatibility
+export const getMessages = () => messagesApi.getMessages()
+export const markMessageRead = (id: number) => messagesApi.markRead(id)
