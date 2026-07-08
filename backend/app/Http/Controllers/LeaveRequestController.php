@@ -16,6 +16,9 @@ class LeaveRequestController extends Controller {
         return Staff::where('user_id', $request->user()->id)->value('id');
     }
 
+    /**
+     * 取得目前登入教職員的請假申請列表。
+     */
     public function index(Request $request): JsonResponse {
         $staffId = $this->myStaffId($request);
         $query = LeaveRequest::where('staff_id', $staffId)
@@ -24,6 +27,9 @@ class LeaveRequestController extends Controller {
         return response()->json(['data' => $query->paginate(20)]);
     }
 
+    /**
+     * 建立新的請假申請單。
+     */
     public function store(Request $request): JsonResponse {
         $validated = $request->validate([
             'leave_type' => 'required|string|max:30',
@@ -36,10 +42,16 @@ class LeaveRequestController extends Controller {
         return response()->json(['data' => $lr], 201);
     }
 
+    /**
+     * 檢視單筆請假申請與簽核資訊。
+     */
     public function show(LeaveRequest $leaveRequest): JsonResponse {
         return response()->json(['data' => $leaveRequest->load(['staff','approver'])]);
     }
 
+    /**
+     * 修改尚未簽核完成的請假申請單。
+     */
     public function update(Request $request, LeaveRequest $leaveRequest): JsonResponse {
         abort_if($leaveRequest->status !== 'PENDING', 422, '只能修改待審中的請假單。');
         $validated = $request->validate([
@@ -52,6 +64,9 @@ class LeaveRequestController extends Controller {
         return response()->json(['data' => $leaveRequest->fresh()]);
     }
 
+    /**
+     * 取消尚未簽核完成的請假申請單。
+     */
     public function destroy(LeaveRequest $leaveRequest): JsonResponse {
         abort_if($leaveRequest->status !== 'PENDING', 422, '只能取消待審中的請假單。');
         $leaveRequest->update(['status' => 'CANCELLED']);

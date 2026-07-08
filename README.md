@@ -29,3 +29,12 @@ CSKM 重建專案，目標技術為 **PHP 8.3 + Laravel 11 + Vue 3**，並採用
 7. 若 `backend/` 已加入 `composer.json`，則自動執行 `composer install && php artisan test`
 8. 若 `frontend/` 已加入 `package.json`，則自動執行前端 test / build
 9. Action 結束後會自動回寫 PR 內的 `CI Checklist（自動更新）` 區塊
+
+## API Documentation
+
+後端已整合 Laravel Scramble，可在啟動 `backend/` Laravel 服務後瀏覽即時 OpenAPI 文件：
+
+- UI：`/docs/api`
+- JSON：`/docs/api.json`
+
+本次文件設定聚焦於 `api/v1` 路由，因此認證、主檔與申請流程等主要 API 端點都會出現在文件中。
