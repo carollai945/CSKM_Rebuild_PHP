@@ -12,6 +12,7 @@ const router = createRouter({
       children: [
         { path: '', redirect: '/dashboard' },
         { path: 'dashboard', name: 'dashboard', component: () => import('@/views/DashboardView.vue') },
+        { path: 'messages', name: 'messages', component: () => import('@/views/MessageCenterView.vue') },
         // Personal
         { path: 'me/personal-data', name: 'personal-data', component: () => import('@/views/PersonalDataView.vue') },
         { path: 'me/change-password', name: 'change-password', component: () => import('@/views/ChangePasswordView.vue') },

@@ -4,6 +4,10 @@
       <div class="sidebar-title">CSKM 管理系統</div>
       <nav>
         <RouterLink to="/dashboard">📊 儀表板</RouterLink>
+        <RouterLink to="/messages" class="message-link">
+          <span>📨 訊息中心</span>
+          <span v-if="unreadCount > 0" class="badge">{{ unreadCount }}</span>
+        </RouterLink>
         <div class="nav-group">個人</div>
         <RouterLink to="/me/personal-data">👤 個人資料</RouterLink>
         <RouterLink to="/me/change-password">🔑 修改密碼</RouterLink>
@@ -56,12 +60,47 @@
 </template>
 
 <script setup lang="ts">
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { getMessages } from '@/api/messages'
 import { useRouter } from 'vue-router'
+
+const READ_KEY = 'message_read_ids'
 const auth = useAuthStore()
 const router = useRouter()
+const unreadCount = ref(0)
+
+function getReadIds() {
+  try {
+    const ids = JSON.parse(localStorage.getItem(READ_KEY) ?? '[]')
+    return new Set(Array.isArray(ids) ? ids.map((id) => Number(id)) : [])
+  } catch {
+    return new Set<number>()
+  }
+}
+
+async function loadUnreadCount() {
+  const response = await getMessages()
+  const rows = response.data?.data?.announcements ?? []
+  const readIds = getReadIds()
+  unreadCount.value = rows.filter((row: Record<string, unknown>) => !readIds.has(Number(row.id))).length
+}
+
+function onReadUpdated() {
+  loadUnreadCount()
+}
+
 async function logout() { await auth.logout(); router.push('/login') }
+
+onMounted(() => {
+  loadUnreadCount()
+  window.addEventListener('messages-read-updated', onReadUpdated)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('messages-read-updated', onReadUpdated)
+})
 </script>
 
 <style scoped>
@@ -70,6 +109,8 @@ async function logout() { await auth.logout(); router.push('/login') }
 .sidebar-title { font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 1rem; padding: .5rem 0; border-bottom: 1px solid #ffffff20; }
 .sidebar a { display: block; color: #ffffffa0; padding: .35rem .5rem; text-decoration: none; font-size: .875rem; }
 .sidebar a:hover, .sidebar a.router-link-active { color: #fff; background: #ffffff15; border-radius: 4px; }
+.message-link { display: flex !important; justify-content: space-between; align-items: center; }
+.badge { background: #ff4d4f; color: #fff; border-radius: 999px; font-size: .75rem; padding: 0 .4rem; min-width: 1.25rem; text-align: center; }
 .nav-group { color: #ffffff50; font-size: .7rem; text-transform: uppercase; margin: .75rem 0 .25rem; padding: 0 .5rem; }
 .content { flex: 1; padding: 1.5rem; background: #f0f2f5; overflow-y: auto; }
 </style>
