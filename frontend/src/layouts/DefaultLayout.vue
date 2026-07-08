@@ -87,13 +87,18 @@ import { RouterLink, RouterView } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { usePermissionStore } from '@/stores/permission'
 import { useNotificationStore } from '@/stores/notification'
+import { getMessages } from '@/api/messages'
 import { useRouter } from 'vue-router'
+
+const READ_KEY = 'message_read_ids'
 const auth = useAuthStore()
 const permission = usePermissionStore()
 const notification = useNotificationStore()
 const router = useRouter()
 const canAccess = (module: string) => permission.canAccess(module)
+
 onMounted(() => notification.fetchMessages())
+
 async function logout() {
   permission.reset()
   notification.reset()
@@ -114,4 +119,5 @@ async function logout() {
 .user-info { font-size: .875rem; color: #595959; }
 .notification-bell { position: relative; font-size: 1.25rem; text-decoration: none; color: #595959; }
 .badge { position: absolute; top: -6px; right: -8px; background: #cf1322; color: #fff; font-size: .65rem; border-radius: 9999px; min-width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; padding: 0 3px; }
+.message-link { display: flex !important; justify-content: space-between; align-items: center; }
 </style>
