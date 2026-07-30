@@ -4,12 +4,13 @@
 
 ## 1. 佈署前需求
 
-1. 安裝 PHP 8.3（含 `mbstring`, `xml`, `curl`, `sqlite3`, `bcmath`, `zip`, `intl`）
+1. 安裝 PHP 8.3（含 `mbstring`, `xml`, `curl`, `bcmath`, `zip`, `intl`, `pdo`, `pdo_mysql`）
 2. 安裝 Composer 2
 3. 安裝 Node.js 20+ 與 npm
 4. 安裝並設定 Nginx
 5. 安裝 Git
-6. 可寫入 `backend/storage` 與 `backend/bootstrap/cache`
+6. 安裝 MySQL 8.0+（或可連線的既有 MySQL）
+7. 可寫入 `backend/storage` 與 `backend/bootstrap/cache`
 
 ## 2. 目錄規劃（範例）
 
@@ -25,11 +26,64 @@ git clone <YOUR_REPO_URL> cskm
 cd cskm
 ```
 
-### 3.1 後端（Laravel）
+### 3.1 資料庫佈署（MySQL）
+
+#### 3.1.1 安裝與啟用 MySQL（若尚未安裝）
+
+```bash
+sudo apt update
+sudo apt install -y mysql-server
+sudo systemctl enable mysql
+sudo systemctl start mysql
+```
+
+#### 3.1.2 建立資料庫與應用帳號
+
+```sql
+CREATE DATABASE cskm_prod CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'cskm_user'@'%' IDENTIFIED BY 'REPLACE_WITH_STRONG_PASSWORD';
+GRANT ALL PRIVILEGES ON cskm_prod.* TO 'cskm_user'@'%';
+FLUSH PRIVILEGES;
+```
+
+可用以下方式進入 MySQL：
+
+```bash
+sudo mysql
+```
+
+#### 3.1.3 設定 Laravel `.env`
 
 ```bash
 cd /var/www/cskm/backend
 cp .env.example .env
+```
+
+編輯 `backend/.env`（至少以下欄位）：
+
+```dotenv
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://your-domain.example
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=cskm_prod
+DB_USERNAME=cskm_user
+DB_PASSWORD=REPLACE_WITH_STRONG_PASSWORD
+```
+
+#### 3.1.4 驗證 PHP / MySQL 驅動
+
+```bash
+php -m | grep -Ei "pdo|mysql"
+```
+
+### 3.2 後端（Laravel）
+
+```bash
+cd /var/www/cskm/backend
 composer install --no-dev --optimize-autoloader
 php artisan key:generate
 php artisan migrate --force
@@ -41,7 +95,7 @@ php artisan storage:link
 
 > 請先完成 `.env` 內 DB / APP_URL / MAIL 等生產環境設定後再上線。
 
-### 3.2 權限設定
+### 3.3 權限設定
 
 ```bash
 cd /var/www/cskm/backend
@@ -49,7 +103,7 @@ chown -R www-data:www-data storage bootstrap/cache
 chmod -R ug+rwx storage bootstrap/cache
 ```
 
-### 3.3 前端（Vue）
+### 3.4 前端（Vue）
 
 ```bash
 cd /var/www/cskm/frontend
@@ -140,6 +194,17 @@ npm ci
 npm run build
 ```
 
+### 6.1 資料庫備份（建議）
+
+```bash
+mysqldump -u cskm_user -p cskm_prod > /var/backups/cskm_prod_$(date +%F).sql
+```
+
 ## 7. 自動佈署
 
-請使用 `scripts/deploy.sh`（本次已提供），可將上述流程自動化。
+請使用 `scripts/deploy.sh`（本次已提供），可將上述流程自動化。  
+執行前請先確認：
+
+1. `backend/.env` 已存在且 DB 參數可連線
+2. PHP 已啟用 `pdo_mysql`
+3. 目標 MySQL 帳號有 `CREATE/ALTER/INDEX` 等 migration 權限
