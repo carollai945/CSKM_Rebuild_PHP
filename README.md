@@ -34,3 +34,8 @@ CSKM 重建專案，目標技術為 **PHP 8.3 + Laravel 11 + Vue 3**，並採用
 
 - `backend/.env.example` 預設已使用 `QUEUE_CONNECTION=database`
 - 啟動 Laravel 佇列背景工作：`cd backend && php artisan queue:work`
+
+## Deployment
+
+- 手動佈署文件：`docs/deployment-manual.md`
+- 自動佈署腳本：`scripts/deploy.sh`
