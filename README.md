@@ -39,3 +39,5 @@ CSKM 重建專案，目標技術為 **PHP 8.3 + Laravel 11 + Vue 3**，並採用
 
 - 手動佈署文件：`docs/deployment-manual.md`
 - 自動佈署腳本：`scripts/deploy.sh`
+- 容器佈署文件（含資料庫）：`docs/deployment-container.md`
+- 容器自動佈署腳本（含資料庫）：`scripts/deploy-container.sh`
