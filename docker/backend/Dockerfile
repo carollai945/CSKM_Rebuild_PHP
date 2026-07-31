@@ -5,9 +5,14 @@ RUN apt-get update \
         git \
         unzip \
         libicu-dev \
+        libfreetype6-dev \
+        libjpeg62-turbo-dev \
+        libpng-dev \
         libzip-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j"$(nproc)" \
         bcmath \
+        gd \
         intl \
         pdo \
         pdo_mysql \
