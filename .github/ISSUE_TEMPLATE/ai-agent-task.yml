@@ -4,6 +4,30 @@ title: "[Task] "
 labels:
   - agent-ready
 body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Fixed Process for AI Assignment (Mandatory)
+        本任務分派給 AI 前，必須遵守固定流程：
+        `Issue → AI Dispatch Planning（Issues / PRs / Actions / Conflict（confilct）/ Merge）→ Design Impact Assessment → FR/PR → Implementation + Required Document Updates → Container Rebuild + Smoke Test → Merge`
+
+  - type: checkboxes
+    id: fixed_process_readiness
+    attributes:
+      label: Fixed Process Readiness
+      description: This section is required before assigning to AI.
+      options:
+        - label: 本 Issue 就是修補工作的起點（未先做後補）
+          required: true
+        - label: 已定義需檢查的設計文件影響範圍（Page Design / SDD / TDD）
+          required: true
+        - label: 已要求 AI 以 FR/PR 交付（不可僅口頭回覆）
+          required: true
+        - label: 已要求 AI 處理 Actions、Conflict（confilct）與 Merge 收斂（CI 綠燈後完成合併與關單）
+          required: true
+        - label: 已要求佈署後重建容器與 smoke test 驗證
+          required: true
+
   - type: input
     id: story_id
     attributes:
@@ -81,6 +105,20 @@ body:
         - Validation errors are shown correctly
         - Status changes from DRAFT to SUBMITTED
         - Related tests are updated
+    validations:
+      required: true
+
+  - type: textarea
+    id: ai_execution_constraints
+    attributes:
+      label: AI Execution Constraints (Fixed Process)
+      description: Add mandatory constraints that the AI must follow while executing this task.
+      placeholder: |
+        - 必須先更新/建立對應 Issue，再開 FR/PR 修補
+        - 必須明確分派 AI 處理 Issues / PRs / Actions / Conflict（confilct）/ Merge
+        - 必須先做 Design Impact Assessment，必要時同步更新文件
+        - 修補完成後必須重建容器並執行 smoke test
+        - PR 必須填寫 Workflow Compliance / Design Impact Assessment / Container Rebuild Verification
     validations:
       required: true
 

@@ -22,7 +22,7 @@
 ```text
 Issue（先建問題單）
    ↓
-AI Dispatch Planning（分派 AI 處理 Issues / PRs / Actions）
+AI Dispatch Planning（分派 AI 處理 Issues / PRs / Actions / Conflict（confilct）/ Merge）
    ↓
 Design Impact Assessment（先判斷是否要改 Page Design / SDD / TDD）
    ↓
@@ -36,7 +36,7 @@ Merge
 ```
 
 > 規則：不可跳過 Issue；不可先修補再補 Issue；若設計文件應變更，必須與修補同一個 PR 交付。
-> 並且每個修補任務都要明確分派 AI 處理：Issue 跟進、PR 交付、Actions 失敗修復。
+> 並且每個修補任務都要明確分派 AI 處理：Issue 跟進、PR 交付、Actions 失敗修復、Conflict（confilct）排除、Merge 收斂。
 
 ## 3. 建議的 GitHub 工作流
 
@@ -95,13 +95,15 @@ Story / BDD / Page Design / SDD / API / Flow-State / TDD
 - Source Documents
 - Done When
 
-### Step 2.5：分派 AI 任務（Issues / PRs / Actions）
+### Step 2.5：分派 AI 任務（Issues / PRs / Actions / Conflict（confilct）/ Merge）
 
-在 Issue 建立後，必須明確指定 AI 要處理的三個面向：
+在 Issue 建立後，必須明確指定 AI 要處理的五個面向：
 
 1. **Issues**：要修哪一張問題單、完成條件是什麼  
 2. **PRs (FRs)**：要開哪一張 PR、需要填哪些固定章節  
 3. **Actions**：若 CI 失敗，AI 必須修到綠燈（如 security-scan、doc-chain、tests）
+4. **Conflict（confilct）**：若 branch 與 `main` 或相依 PR 發生衝突，AI 必須完成衝突排除並回推
+5. **Merge**：條件達成後執行合併，並確認對應 Issue 自動關閉（或手動關閉）
 
 ### Step 3：建立 branch
 
