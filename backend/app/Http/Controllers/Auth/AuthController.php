@@ -77,6 +77,9 @@ class AuthController extends Controller
         if (! $staff->user) {
             return response()->json([
                 'message' => 'Staff account is not linked to a login user.',
+                'errors'  => [
+                    'staff_id' => ['Staff account is not linked to a login user.'],
+                ],
             ], 422);
         }
 

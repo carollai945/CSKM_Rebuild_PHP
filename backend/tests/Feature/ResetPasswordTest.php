@@ -57,6 +57,7 @@ class ResetPasswordTest extends TestCase
             ]);
 
         $response->assertStatus(422)
-            ->assertJsonPath('message', 'Staff account is not linked to a login user.');
+            ->assertJsonPath('message', 'Staff account is not linked to a login user.')
+            ->assertJsonPath('errors.staff_id.0', 'Staff account is not linked to a login user.');
     }
 }
