@@ -17,7 +17,28 @@
 
 ---
 
-## 2. 建議的 GitHub 工作流
+## 2. 固定流程（所有 AI 一律遵循）
+
+```text
+Issue（先建問題單）
+   ↓
+AI Dispatch Planning（分派 AI 處理 Issues / PRs / Actions）
+   ↓
+Design Impact Assessment（先判斷是否要改 Page Design / SDD / TDD）
+   ↓
+FR / PR（再提交修補）
+   ↓
+Implementation + Required Document Updates（程式與必要文件同 PR）
+   ↓
+Container Rebuild + Smoke Test（重建容器與核心流程驗證）
+   ↓
+Merge
+```
+
+> 規則：不可跳過 Issue；不可先修補再補 Issue；若設計文件應變更，必須與修補同一個 PR 交付。
+> 並且每個修補任務都要明確分派 AI 處理：Issue 跟進、PR 交付、Actions 失敗修復。
+
+## 3. 建議的 GitHub 工作流
 
 ```text
 Story / BDD / Page Design / SDD / API / Flow-State / TDD
@@ -35,7 +56,7 @@ Story / BDD / Page Design / SDD / API / Flow-State / TDD
 
 ---
 
-## 3. 本次已實作的 GitHub 骨架
+## 4. 本次已實作的 GitHub 骨架
 
 以下檔案已加到 repo：
 
@@ -48,7 +69,7 @@ Story / BDD / Page Design / SDD / API / Flow-State / TDD
 
 ---
 
-## 4. 建議的操作方式
+## 5. 建議的操作方式
 
 ### Step 1：先有規格
 
@@ -62,7 +83,7 @@ Story / BDD / Page Design / SDD / API / Flow-State / TDD
 - API Design
 - Flow-State
 
-### Step 2：開 GitHub Issue
+### Step 2：開 GitHub Issue（固定流程第一步）
 
 使用 `AI Agent Task` Issue Form 建立任務，填入：
 
@@ -73,6 +94,14 @@ Story / BDD / Page Design / SDD / API / Flow-State / TDD
 - Out of Scope
 - Source Documents
 - Done When
+
+### Step 2.5：分派 AI 任務（Issues / PRs / Actions）
+
+在 Issue 建立後，必須明確指定 AI 要處理的三個面向：
+
+1. **Issues**：要修哪一張問題單、完成條件是什麼  
+2. **PRs (FRs)**：要開哪一張 PR、需要填哪些固定章節  
+3. **Actions**：若 CI 失敗，AI 必須修到綠燈（如 security-scan、doc-chain、tests）
 
 ### Step 3：建立 branch
 
@@ -92,17 +121,20 @@ Story / BDD / Page Design / SDD / API / Flow-State / TDD
 - 必須更新的模組
 - 是否需要同步更新文件
 
-### Step 5：開 Pull Request
+### Step 5：開 Pull Request（FR）
 
 PR 必須依照 `.github/pull_request_template.md` 填寫，至少包含：
 
 - Linked Issue
+- Workflow Compliance（固定流程勾選）
 - Story ID
 - Task ID
 - Source Documents
 - Scope / Out of Scope
 - Done When
 - Tests
+- Design Impact Assessment
+- Container Rebuild Verification
 - Notes for Next Agent
 
 ### Step 6：由 GitHub Actions 檢查
@@ -122,7 +154,7 @@ PR 必須依照 `.github/pull_request_template.md` 填寫，至少包含：
 
 ---
 
-## 5. Issue 與 PR 的角色分工
+## 6. Issue 與 PR 的角色分工
 
 | 項目 | 主要用途 |
 |---|---|
@@ -133,7 +165,7 @@ PR 必須依照 `.github/pull_request_template.md` 填寫，至少包含：
 
 ---
 
-## 6. 建議的 Label
+## 7. 建議的 Label
 
 建議在 GitHub 手動建立以下 label：
 
@@ -154,7 +186,7 @@ PR 必須依照 `.github/pull_request_template.md` 填寫，至少包含：
 
 ---
 
-## 7. 最小可執行做法
+## 8. 最小可執行做法
 
 若你要從零開始，先做這 5 步就夠：
 
@@ -166,7 +198,7 @@ PR 必須依照 `.github/pull_request_template.md` 填寫，至少包含：
 
 ---
 
-## 8. 推薦的第一個實戰任務
+## 9. 推薦的第一個實戰任務
 
 推薦先從以下任務之一開始：
 
@@ -178,7 +210,7 @@ PR 必須依照 `.github/pull_request_template.md` 填寫，至少包含：
 
 ---
 
-## 9. 實務提醒
+## 10. 實務提醒
 
 1. 不要一張 Issue 做整個模組
 2. 不要讓 PR 同時混進多個 Story
@@ -188,6 +220,6 @@ PR 必須依照 `.github/pull_request_template.md` 填寫，至少包含：
 
 ---
 
-## 10. 一句話結論
+## 11. 一句話結論
 
 **文件是規格來源，GitHub 是任務中樞；把 Issue、Branch、PR、Workflow 固定化後，AI Agent 才能穩定地一棒接一棒持續開發。**
