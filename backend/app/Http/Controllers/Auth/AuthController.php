@@ -74,6 +74,12 @@ class AuthController extends Controller
         ]);
 
         $staff = \App\Models\Staff::with('user')->findOrFail($request->staff_id);
+        if (! $staff->user) {
+            return response()->json([
+                'message' => 'Staff account is not linked to a login user.',
+            ], 422);
+        }
+
         $staff->user->update([
             'password' => \Illuminate\Support\Facades\Hash::make($request->new_password),
         ]);
