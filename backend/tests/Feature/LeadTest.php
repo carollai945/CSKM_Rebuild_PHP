@@ -27,10 +27,11 @@ class LeadTest extends TestCase
 
     public function test_index_returns_lead_list(): void
     {
-        Sanctum::actingAs($this->staffUser());
+        $staff = $this->staffUser();
+        Sanctum::actingAs($staff);
 
-        Lead::create(['name' => '張三', 'status' => 'NEW', 'created_by' => 1]);
-        Lead::create(['name' => '李四', 'status' => 'CONTACTED', 'created_by' => 1]);
+        Lead::create(['name' => '張三', 'status' => 'NEW', 'created_by' => $staff->id]);
+        Lead::create(['name' => '李四', 'status' => 'CONTACTED', 'created_by' => $staff->id]);
 
         $response = $this->getJson('/api/v1/leads');
 
@@ -39,10 +40,11 @@ class LeadTest extends TestCase
 
     public function test_index_filters_by_status(): void
     {
-        Sanctum::actingAs($this->staffUser());
+        $staff = $this->staffUser();
+        Sanctum::actingAs($staff);
 
-        Lead::create(['name' => '新名單', 'status' => 'NEW', 'created_by' => 1]);
-        Lead::create(['name' => '已聯絡', 'status' => 'CONTACTED', 'created_by' => 1]);
+        Lead::create(['name' => '新名單', 'status' => 'NEW', 'created_by' => $staff->id]);
+        Lead::create(['name' => '已聯絡', 'status' => 'CONTACTED', 'created_by' => $staff->id]);
 
         $response = $this->getJson('/api/v1/leads?status=NEW');
 
@@ -51,10 +53,11 @@ class LeadTest extends TestCase
 
     public function test_index_filters_by_keyword(): void
     {
-        Sanctum::actingAs($this->staffUser());
+        $staff = $this->staffUser();
+        Sanctum::actingAs($staff);
 
-        Lead::create(['name' => '王大明', 'status' => 'NEW', 'created_by' => 1]);
-        Lead::create(['name' => '李小美', 'status' => 'NEW', 'created_by' => 1]);
+        Lead::create(['name' => '王大明', 'status' => 'NEW', 'created_by' => $staff->id]);
+        Lead::create(['name' => '李小美', 'status' => 'NEW', 'created_by' => $staff->id]);
 
         $response = $this->getJson('/api/v1/leads?keyword=王');
 
