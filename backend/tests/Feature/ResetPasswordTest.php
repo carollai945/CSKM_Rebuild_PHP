@@ -43,4 +43,21 @@ class ResetPasswordTest extends TestCase
 
         $response->assertStatus(403);
     }
+
+    public function test_reset_password_returns_422_when_staff_has_no_user(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $staff = Staff::factory()->create(['user_id' => null]);
+
+        $response = $this->actingAs($admin)
+            ->postJson('/api/v1/auth/reset-password', [
+                'staff_id'                  => $staff->id,
+                'new_password'              => 'NewPassword123!',
+                'new_password_confirmation' => 'NewPassword123!',
+            ]);
+
+        $response->assertStatus(422)
+            ->assertJsonPath('message', 'Staff account is not linked to a login user.')
+            ->assertJsonPath('errors.staff_id.0', 'Staff account is not linked to a login user.');
+    }
 }
