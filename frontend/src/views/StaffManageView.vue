@@ -24,9 +24,19 @@
       <div class="modal">
         <h3>F02 人員管理</h3>
         <form @submit.prevent="save">
-          <div><label>姓名</label><input v-model="form.name" placeholder="姓名" /></div>
-          <div><label>電話</label><input v-model="form.phone" placeholder="電話" /></div>
+          <div><label>員工編號</label><input v-model="form.staff_no" placeholder="員工編號" required /></div>
+          <div><label>姓名</label><input v-model="form.name" placeholder="姓名" required /></div>
+          <div><label>簡稱</label><input v-model="form.abbr" placeholder="簡稱（選填）" /></div>
           <div><label>到職日</label><input type="date" v-model="form.join_date" /></div>
+          <div>
+            <label>狀態</label>
+            <select v-model="form.status" required>
+              <option value="ACTIVE">ACTIVE</option>
+              <option value="INACTIVE">INACTIVE</option>
+              <option value="LEFT">LEFT</option>
+            </select>
+          </div>
+          <p v-if="formError" style="color:red">{{ formError }}</p>
           <div class="modal-actions">
             <button type="submit">儲存</button>
             <button type="button" @click="showForm = false">取消</button>
@@ -59,14 +69,41 @@ const rows = ref<Record<string,unknown>[]>([])
 const loading = ref(false)
 const showForm = ref(false)
 const editId = ref<number|null>(null)
-const form = ref<Record<string,unknown>>({})
+const form = ref<Record<string,unknown>>({ staff_no: '', name: '', abbr: '', join_date: '', status: 'ACTIVE' })
+const formError = ref('')
 const resetModal = ref(false)
 const resetStaff = ref<Record<string,unknown>|null>(null)
 const resetForm = ref({ new_password: '', new_password_confirmation: '' })
 const resetMsg = ref(''); const resetError = ref('')
 async function load() { loading.value=true; const r = await staffApi.list(); rows.value = r.data?.data?.data ?? r.data?.data ?? []; loading.value=false }
-function edit(row: Record<string,unknown>) { editId.value = row.id as number; form.value = {...row}; showForm.value = true }
-async function save() { if (editId.value) await staffApi.update(editId.value, form.value); else await staffApi.create(form.value); showForm.value=false; editId.value=null; form.value={}; load() }
+function edit(row: Record<string,unknown>) {
+  editId.value = row.id as number
+  formError.value = ''
+  form.value = {
+    ...row,
+    staff_no: String(row.staff_no ?? ''),
+    name: String(row.name ?? ''),
+    abbr: String(row.abbr ?? ''),
+    join_date: String(row.join_date ?? ''),
+    status: String(row.status ?? 'ACTIVE'),
+  }
+  showForm.value = true
+}
+async function save() {
+  formError.value = ''
+  try {
+    if (editId.value) await staffApi.update(editId.value, form.value)
+    else await staffApi.create(form.value)
+    showForm.value = false
+    editId.value = null
+    form.value = { staff_no: '', name: '', abbr: '', join_date: '', status: 'ACTIVE' }
+    load()
+  } catch (e: unknown) {
+    const err = e as { response?: { data?: { message?: string; errors?: Record<string, string[]> } } }
+    const firstField = Object.values(err?.response?.data?.errors ?? {})[0]?.[0]
+    formError.value = firstField ?? err?.response?.data?.message ?? '儲存失敗'
+  }
+}
 function openReset(row: Record<string,unknown>) { resetStaff.value=row; resetForm.value={new_password:'',new_password_confirmation:''}; resetMsg.value=''; resetError.value=''; resetModal.value=true }
 async function doReset() {
   try {
