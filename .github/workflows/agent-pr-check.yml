@@ -143,54 +143,101 @@ jobs:
     if: ${{ github.event.pull_request.draft == false && !startsWith(github.event.pull_request.title, '[WIP]') }}
     runs-on: ubuntu-latest
     steps:
-      - name: Validate required PR sections
-        env:
-          PR_BODY: ${{ github.event.pull_request.body }}
-        run: |
-          python3 - <<'PY'
-          import os
-          import re
-          import sys
+      - name: Auto-populate missing sections and validate PR body
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const pull_number = context.payload.pull_request.number;
 
-          body = os.getenv("PR_BODY") or ""
-          required_sections = [
-              "## Story ID",
-              "## Task ID",
-              "## Source Documents",
-              "## Scope",
-              "## Out of Scope",
-              "## Done When",
-              "## Tests",
-              "## Notes for Next Agent",
-          ]
+            // Fetch the latest PR body from the API so we always work with current content
+            const { data: pr } = await github.rest.pulls.get({ owner, repo, pull_number });
+            let body = pr.body || "";
 
-          missing = [section for section in required_sections if section not in body]
-          has_linked_issue_section = "## Linked Issue" in body
-          has_issue_reference = bool(
-              re.search(r"(?im)\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s*:?\s*#\d+\b", body)
-              or re.search(r"(?im)\bissue\s*#\d+\b", body)
-          )
-          if not has_linked_issue_section and not has_issue_reference:
-              missing.append("Linked issue reference (## Linked Issue or Issue #123 / Closes #123)")
+            const requiredSections = [
+              { header: "## Story ID",             placeholder: "_（請填入相關 Story ID，例如：F02-2）_" },
+              { header: "## Task ID",              placeholder: "_（請填入 Task/Issue 編號）_" },
+              {
+                header: "## Source Documents",
+                placeholder: [
+                  "- `docs/CSKM_UserStories.md`",
+                  "- `docs/api-design/CSKM_API_Design.md`",
+                  "- `docs/data-model/CSKM_Data_Model_Design.md`",
+                ].join("\n"),
+              },
+              { header: "## Scope",               placeholder: "_（請描述本 PR 的範圍）_" },
+              { header: "## Out of Scope",         placeholder: "_（請描述本 PR 不包含的範圍）_" },
+              { header: "## Done When",            placeholder: "_（請描述完成條件）_" },
+              { header: "## Tests",                placeholder: "_（請描述測試方式）_" },
+              { header: "## Notes for Next Agent", placeholder: "_（給下一個 Agent 的備注）_" },
+            ];
 
-          if missing:
-              print("PR body is missing required sections:")
-              for section in missing:
-                  print(f"- {section}")
-              sys.exit(1)
+            // Auto-populate any missing sections
+            const autoAdded = [];
+            for (const { header, placeholder } of requiredSections) {
+              if (!body.includes(header)) {
+                autoAdded.push(header);
+                body = `${body.trimEnd()}\n\n${header}\n${placeholder}`;
+              }
+            }
 
-          print("PR body includes all required sections.")
-          PY
+            const hasLinkedIssueSection = body.includes("## Linked Issue");
+            const hasIssueReference =
+              /\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s*:?\s*#\d+\b/im.test(body) ||
+              /\bissue\s*#\d+\b/im.test(body);
+            if (!hasLinkedIssueSection && !hasIssueReference) {
+              autoAdded.push("## Linked Issue");
+              body = `${body.trimEnd()}\n\n## Linked Issue\n_（請填入關聯的 Issue 編號，例如：Closes #123）_`;
+            }
+
+            if (autoAdded.length > 0) {
+              core.info(`Auto-populating missing sections: ${autoAdded.join(", ")}`);
+              await github.rest.pulls.update({ owner, repo, pull_number, body });
+              core.info("PR body updated with missing sections.");
+            }
+
+            // Validate the (now-complete) body
+            const finalMissing = requiredSections
+              .map(({ header }) => header)
+              .filter((h) => !body.includes(h));
+
+            const finalHasLinked =
+              body.includes("## Linked Issue") ||
+              /\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s*:?\s*#\d+\b/im.test(body) ||
+              /\bissue\s*#\d+\b/im.test(body);
+            if (!finalHasLinked) {
+              finalMissing.push("Linked issue reference (## Linked Issue or Issue #123 / Closes #123)");
+            }
+
+            if (finalMissing.length > 0) {
+              core.setFailed(
+                `PR body is missing required sections:\n${finalMissing.map((s) => `- ${s}`).join("\n")}`
+              );
+            } else {
+              core.info("PR body includes all required sections.");
+            }
 
   validate-doc-chain:
     if: ${{ github.event.pull_request.draft == false && !startsWith(github.event.pull_request.title, '[WIP]') }}
+    needs: [validate-pr-body]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
+      - name: Get latest PR body
+        id: fetch-pr-body
+        uses: actions/github-script@v7
+        with:
+          result-encoding: string
+          script: |
+            const { owner, repo } = context.repo;
+            const pull_number = context.payload.pull_request.number;
+            const { data: pr } = await github.rest.pulls.get({ owner, repo, pull_number });
+            return pr.body || "";
+
       - name: Validate required docs and referenced source documents
         env:
-          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_BODY: ${{ steps.fetch-pr-body.outputs.result }}
         run: |
           python3 - <<'PY'
           import os
