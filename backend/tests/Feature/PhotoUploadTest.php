@@ -21,7 +21,7 @@ class PhotoUploadTest extends TestCase
 
         $response = $this->actingAs($user)
             ->postJson('/api/v1/me/personal-data/photo', [
-                'photo' => UploadedFile::fake()->image('avatar.jpg', 100, 100),
+                'photo' => UploadedFile::fake()->create('avatar.jpg', 100, 'image/jpeg'),
             ]);
 
         $response->assertStatus(200)
