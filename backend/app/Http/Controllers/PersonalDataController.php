@@ -71,7 +71,7 @@ class PersonalDataController extends Controller
     public function uploadPhoto(Request $request): JsonResponse
     {
         $request->validate([
-            'photo' => 'required|image|mimes:jpeg,png,gif|max:2048',
+            'photo' => 'required|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
         ]);
 
         $staff = Staff::where('user_id', $request->user()->id)->firstOrFail();

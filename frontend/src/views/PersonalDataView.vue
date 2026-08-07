@@ -24,6 +24,7 @@
         <div class="form-group info"><label>職稱</label><span>{{ (form.title as Record<string,unknown>)?.name }}</span></div>
         <button type="submit">儲存</button>
         <p v-if="msg" style="color:green;margin-top:.5rem">{{ msg }}</p>
+        <p v-if="error" style="color:#ff4d4f;margin-top:.5rem">{{ error }}</p>
       </form>
     </div>
   </div>
@@ -37,19 +38,31 @@ const photoFile = ref<File|null>(null)
 const photoPreview = ref<string|null>(null)
 const fileInput = ref<HTMLInputElement|null>(null)
 const msg = ref('')
+const error = ref('')
 async function load() { const r = await personalDataApi.get(); form.value = r.data?.data ?? {} }
-async function save() { await personalDataApi.update(form.value); msg.value='儲存成功'; setTimeout(()=>msg.value='',3000) }
+async function save() { await personalDataApi.update(form.value); msg.value='儲存成功'; error.value=''; setTimeout(()=>msg.value='',3000) }
 function onPhotoChange(e: Event) {
   const t = e.target as HTMLInputElement
   photoFile.value = t.files?.[0] ?? null
   if (photoFile.value) photoPreview.value = URL.createObjectURL(photoFile.value)
+  error.value = ''
 }
 async function uploadPhoto() {
   if (!photoFile.value) return
-  const fd = new FormData(); fd.append('photo', photoFile.value)
-  const r = await import('@/api/axios').then(m => m.default.post('/me/personal-data/photo', fd, { headers: { 'Content-Type': 'multipart/form-data' } }))
-  form.value.photo_url = r.data?.data?.photo_url; photoFile.value = null; photoPreview.value = null
-  msg.value = '照片上傳成功'; setTimeout(()=>msg.value='',3000)
+  try {
+    const r = await personalDataApi.uploadPhoto(photoFile.value)
+    form.value.photo_url = r.data?.data?.photo_url
+    photoFile.value = null
+    photoPreview.value = null
+    if (fileInput.value) fileInput.value.value = ''
+    msg.value = '照片上傳成功'
+    error.value = ''
+    setTimeout(() => (msg.value = ''), 3000)
+  } catch (e: unknown) {
+    const err = e as { response?: { data?: { message?: string; errors?: Record<string, string[]> } } }
+    error.value = err?.response?.data?.errors?.photo?.[0] ?? err?.response?.data?.message ?? '照片上傳失敗'
+    msg.value = ''
+  }
 }
 onMounted(load)
 </script>
