@@ -9,7 +9,7 @@
       <thead><tr><th>日期</th><th>類型</th><th>狀態</th><th>內容</th><th>操作</th></tr></thead>
       <tbody>
         <tr v-for="r in rows" :key="r.id">
-          <td>{{r.report_date}}</td><td>{{r.report_type}}</td><td>{{r.status}}</td>
+          <td>{{r.report_date}}</td><td>{{reportTypeLabel(r.report_type as string)}}</td><td>{{reportStatusLabel(r.status as string)}}</td>
           <td>{{(r.content as string) || '-'}}</td>
           <td>
             <button @click="view(r.id as number)">檢視</button>
@@ -20,7 +20,7 @@
     </table>
     <div v-if="showForm" class="modal-overlay" @click.self="showForm=false">
       <div class="modal"><h3>A02 個人報表</h3>
-        <div><label>類型</label><select v-model="form.report_type"><option value="DAILY">日報</option><option value="WEEKLY">週報</option></select></div>
+        <div><label>類型</label><select v-model="form.report_type"><option value="DAILY">{{ reportTypeLabel('DAILY') }}</option><option value="WEEKLY">{{ reportTypeLabel('WEEKLY') }}</option></select></div>
         <div><label>日期</label><input type="date" v-model="form.report_date"/></div>
         <div><label>內容</label><textarea v-model="form.content" rows="4"/></div>
         <div class="modal-actions"><button @click="save">儲存</button><button @click="showForm=false">取消</button></div>
@@ -30,8 +30,8 @@
       <div class="modal">
         <h3>報表內容</h3>
         <div><label>日期</label><div>{{detail.report_date}}</div></div>
-        <div><label>類型</label><div>{{detail.report_type}}</div></div>
-        <div><label>狀態</label><div>{{detail.status}}</div></div>
+        <div><label>類型</label><div>{{reportTypeLabel(detail.report_type as string)}}</div></div>
+        <div><label>狀態</label><div>{{reportStatusLabel(detail.status as string)}}</div></div>
         <div><label>內容</label><pre class="content">{{detail.content || '-'}}</pre></div>
         <div class="modal-actions"><button @click="showDetail=false">關閉</button></div>
       </div>
@@ -47,6 +47,28 @@ const loading = ref(false); const showForm = ref(false)
 const form = ref<Record<string,unknown>>({ report_type:'DAILY', report_date:'', content:'' })
 const showDetail = ref(false)
 const detail = ref<Record<string,unknown>>({})
+const locale = (typeof window !== 'undefined' && (window.localStorage.getItem('locale') || navigator.language))
+  ? String((window.localStorage.getItem('locale') || navigator.language)).toLowerCase()
+  : 'zh-tw'
+const isZh = locale.startsWith('zh')
+
+function reportTypeLabel(value: string): string {
+  const map = {
+    DAILY: isZh ? '日報' : 'Daily',
+    WEEKLY: isZh ? '週報' : 'Weekly',
+  } as const
+  return map[value as keyof typeof map] ?? value
+}
+
+function reportStatusLabel(value: string): string {
+  const map = {
+    DRAFT: isZh ? '草稿' : 'Draft',
+    SUBMITTED: isZh ? '已送審' : 'Submitted',
+    APPROVED: isZh ? '已核准' : 'Approved',
+    REJECTED: isZh ? '已退回' : 'Rejected',
+  } as const
+  return map[value as keyof typeof map] ?? value
+}
 async function load() { loading.value=true; const r=await reportsApi.list(); rows.value=r.data?.data?.data??[]; loading.value=false }
 async function save() {
   const r = await reportsApi.create(form.value)
