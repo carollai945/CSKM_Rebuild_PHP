@@ -47,12 +47,23 @@ const loading = ref(false); const showForm = ref(false)
 const form = ref<Record<string,unknown>>({ report_type:'DAILY', report_date:'', content:'' })
 const showDetail = ref(false)
 const detail = ref<Record<string,unknown>>({})
-const locale = (typeof window !== 'undefined' && (window.localStorage.getItem('locale') || navigator.language))
-  ? String((window.localStorage.getItem('locale') || navigator.language)).toLowerCase()
-  : 'zh-tw'
-const isZh = locale.startsWith('zh')
+
+function currentLocale(): string {
+  if (typeof window === 'undefined') return 'zh-tw'
+  const fromStorage = window.localStorage.getItem('locale')
+    || window.localStorage.getItem('lang')
+    || window.localStorage.getItem('language')
+  const fromDocument = document.documentElement.lang
+  const locale = String(fromStorage || fromDocument || 'zh-tw').toLowerCase()
+  return locale || 'zh-tw'
+}
+
+function isZhLocale(): boolean {
+  return currentLocale().startsWith('zh')
+}
 
 function reportTypeLabel(value: string): string {
+  const isZh = isZhLocale()
   const map = {
     DAILY: isZh ? '日報' : 'Daily',
     WEEKLY: isZh ? '週報' : 'Weekly',
@@ -61,6 +72,7 @@ function reportTypeLabel(value: string): string {
 }
 
 function reportStatusLabel(value: string): string {
+  const isZh = isZhLocale()
   const map = {
     DRAFT: isZh ? '草稿' : 'Draft',
     SUBMITTED: isZh ? '已送審' : 'Submitted',
