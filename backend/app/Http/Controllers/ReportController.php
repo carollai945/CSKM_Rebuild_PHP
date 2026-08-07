@@ -18,7 +18,8 @@ class ReportController extends Controller {
         $query = Report::where('staff_id', $staffId)
             ->when($request->report_type, fn($q,$v) => $q->where('report_type',$v))
             ->when($request->status, fn($q,$v) => $q->where('status',$v))
-            ->latest('report_date');
+            ->orderByDesc('report_date')
+            ->orderByDesc('id');
         return response()->json(['data' => $query->paginate(20)]);
     }
 
@@ -31,7 +32,7 @@ class ReportController extends Controller {
         ]);
         $validated['staff_id'] = $staffId;
         $report = Report::create($validated);
-        return response()->json(['data' => $report], 201);
+        return response()->json(['data' => $report->fresh()], 201);
     }
 
     public function show(Report $report): JsonResponse {

@@ -6,11 +6,15 @@
     </div>
     <div v-if="loading">載入中...</div>
     <table v-else>
-      <thead><tr><th>日期</th><th>類型</th><th>狀態</th><th>操作</th></tr></thead>
+      <thead><tr><th>日期</th><th>類型</th><th>狀態</th><th>內容</th><th>操作</th></tr></thead>
       <tbody>
         <tr v-for="r in rows" :key="r.id">
           <td>{{r.report_date}}</td><td>{{r.report_type}}</td><td>{{r.status}}</td>
-          <td><button v-if="r.status==='DRAFT'" @click="submit(r.id as number)">送審</button></td>
+          <td>{{(r.content as string) || '-'}}</td>
+          <td>
+            <button @click="view(r.id as number)">檢視</button>
+            <button v-if="r.status==='DRAFT'" @click="submit(r.id as number)">送審</button>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -22,6 +26,16 @@
         <div class="modal-actions"><button @click="save">儲存</button><button @click="showForm=false">取消</button></div>
       </div>
     </div>
+    <div v-if="showDetail" class="modal-overlay" @click.self="showDetail=false">
+      <div class="modal">
+        <h3>報表內容</h3>
+        <div><label>日期</label><div>{{detail.report_date}}</div></div>
+        <div><label>類型</label><div>{{detail.report_type}}</div></div>
+        <div><label>狀態</label><div>{{detail.status}}</div></div>
+        <div><label>內容</label><pre class="content">{{detail.content || '-'}}</pre></div>
+        <div class="modal-actions"><button @click="showDetail=false">關閉</button></div>
+      </div>
+    </div>
   </div>
 </template>
 <script setup lang="ts">
@@ -31,9 +45,23 @@ import { reportsApi } from '@/api/reports'
 const rows = ref<Record<string,unknown>[]>([])
 const loading = ref(false); const showForm = ref(false)
 const form = ref<Record<string,unknown>>({ report_type:'DAILY', report_date:'', content:'' })
+const showDetail = ref(false)
+const detail = ref<Record<string,unknown>>({})
 async function load() { loading.value=true; const r=await reportsApi.list(); rows.value=r.data?.data?.data??[]; loading.value=false }
-async function save() { await reportsApi.create(form.value); showForm.value=false; load() }
+async function save() {
+  const r = await reportsApi.create(form.value)
+  const created = r.data?.data ?? {}
+  form.value = { report_type:'DAILY', report_date:'', content:'' }
+  showForm.value = false
+  await load()
+  if (created.id) await view(created.id as number)
+}
 async function submit(id: number) { await reportsApi.submit(id); load() }
+async function view(id: number) {
+  const r = await reportsApi.get(id)
+  detail.value = r.data?.data ?? {}
+  showDetail.value = true
+}
 onMounted(load)
 </script>
 <style scoped>
@@ -52,5 +80,6 @@ th { background:#fafafa;font-weight:600 }
 .modal { background:#fff;padding:2rem;border-radius:8px;min-width:360px }
 .modal input,.modal select,.modal textarea { display:block;width:100%;margin:.5rem 0;padding:.5rem;border:1px solid #d9d9d9;border-radius:4px }
 .modal-actions { margin-top:1rem;display:flex;gap:.5rem }
+.content { white-space:pre-wrap;background:#fafafa;padding:.5rem;border:1px solid #eee;border-radius:4px }
 button.danger { background:#ff4d4f }
 </style>
