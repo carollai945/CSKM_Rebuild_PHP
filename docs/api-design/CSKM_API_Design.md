@@ -84,7 +84,7 @@
 | `POST` | `/auth/login` | 登入 |
 | `POST` | `/auth/logout` | 登出 |
 | `GET` | `/auth/me` | 取得當前登入者資訊與權限 |
-| `POST` | `/auth/change-password` | 修改自己的密碼 |
+| `POST` | `/me/change-password` | 修改自己的密碼 |
 | `POST` | `/auth/reset-password` | 管理員重設他人密碼 |
 | `GET` | `/messages` | 取得訊息中心資料 |
 | `PATCH` | `/messages/{messageId}/read` | 標記已讀 |
@@ -99,15 +99,15 @@
 
 | Method | Path | 用途 |
 |---|---|---|
-| `GET` | `/regions` | 查詢區域 |
-| `POST` | `/regions` | 建立區域 |
-| `PUT` | `/regions/{regionId}` | 修改區域 |
-| `GET` | `/departments` | 查詢部門 |
-| `POST` | `/departments` | 建立部門 |
-| `PUT` | `/departments/{departmentId}` | 修改部門 |
-| `GET` | `/titles` | 查詢職稱 |
-| `POST` | `/titles` | 建立職稱 |
-| `PUT` | `/titles/{titleId}` | 修改職稱 |
+| `GET` | `/master/regions` | 查詢區域 |
+| `POST` | `/master/regions` | 建立區域 |
+| `PUT` | `/master/regions/{regionId}` | 修改區域 |
+| `GET` | `/master/departments` | 查詢部門 |
+| `POST` | `/master/departments` | 建立部門 |
+| `PUT` | `/master/departments/{departmentId}` | 修改部門 |
+| `GET` | `/master/titles` | 查詢職稱 |
+| `POST` | `/master/titles` | 建立職稱 |
+| `PUT` | `/master/titles/{titleId}` | 修改職稱 |
 
 ### 4.2 教務主檔
 
@@ -201,8 +201,8 @@
 | `POST` | `/leads` | 建立名單 |
 | `PUT` | `/leads/{leadId}` | 修改名單 |
 | `DELETE` | `/leads/{leadId}` | 刪除名單 |
-| `POST` | `/leads:assign` | 批次派發 |
-| `POST` | `/leads:import` | Excel 匯入 |
+| `POST` | `/leads/assign` | 批次派發 |
+| `POST` | `/leads/import` | Excel 匯入 |
 
 ### 6.2 電訪與服務
 
@@ -248,19 +248,19 @@
 | `POST` | `/applications/{type}` | 建立草稿 |
 | `GET` | `/applications/{type}/{applicationId}` | 查詢明細 |
 | `PUT` | `/applications/{type}/{applicationId}` | 修改草稿 |
-| `POST` | `/applications/{type}/{applicationId}:submit` | 送審 |
-| `POST` | `/applications/{type}/{applicationId}:cancel` | 取消 |
-| `POST` | `/applications/{type}/{applicationId}:delete` | 刪除草稿 |
+| `POST` | `/applications/{type}/{applicationId}/submit` | 送審 |
+| `POST` | `/applications/{type}/{applicationId}/cancel` | 取消 |
+| `DELETE` | `/applications/{type}/{applicationId}` | 刪除草稿 |
 
 ### 7.2 批核任務
 
 | Method | Path | 用途 |
 |---|---|---|
-| `GET` | `/approval-tasks` | 查詢待審任務 |
-| `POST` | `/approval-tasks/{taskId}:approve` | 單筆核准 |
-| `POST` | `/approval-tasks/{taskId}:reject` | 單筆退回 |
-| `POST` | `/approval-tasks:batch-approve` | 批次核准 |
-| `POST` | `/approval-tasks:batch-reject` | 批次退回 |
+| `GET` | `/approvals/{type}/pending` | 查詢待審任務（`type` 例：`leave-requests`） |
+| `POST` | `/approvals/{type}/{id}/approve` | 單筆核准 |
+| `POST` | `/approvals/{type}/{id}/reject` | 單筆退回 |
+| `POST` | `/approvals/{type}/batch-approve` | 批次核准 |
+| `POST` | `/approvals/{type}/batch-reject` | 批次退回 |
 
 ### 7.3 設計重點
 
@@ -283,10 +283,10 @@
 | `POST` | `/reports` | 建立報表 |
 | `GET` | `/reports/{reportId}` | 查詢報表明細 |
 | `PUT` | `/reports/{reportId}` | 修改草稿 |
-| `POST` | `/reports/{reportId}:submit` | 送審 |
-| `GET` | `/report-approval-tasks` | 查詢待審報表 |
-| `POST` | `/report-approval-tasks/{taskId}:approve` | 核准報表 |
-| `POST` | `/report-approval-tasks/{taskId}:reject` | 退回報表 |
+| `POST` | `/reports/{reportId}/submit` | 送審 |
+| `GET` | `/approvals/reports/pending` | 查詢待審報表 |
+| `POST` | `/approvals/reports/{reportId}/approve` | 核准報表 |
+| `POST` | `/approvals/reports/{reportId}/reject` | 退回報表 |
 
 ### 重要欄位
 
@@ -309,26 +309,27 @@
 | `GET` | `/payments` | 查詢繳費 |
 | `POST` | `/payments` | 建立繳費 |
 | `GET` | `/payments/{paymentId}` | 查詢繳費明細 |
-| `POST` | `/payments/{paymentId}:finance-confirm` | 財務確認 |
-| `POST` | `/payments/{paymentId}:academic-confirm` | 教務確認 |
-| `POST` | `/payments/{paymentId}:reject` | 退回繳費 |
+| `POST` | `/payments/{paymentId}/finance-confirm` | 財務確認 |
+| `POST` | `/payments/{paymentId}/academic-confirm` | 教務確認 |
+| `POST` | `/payments/{paymentId}/reject` | 退回繳費 |
 
 ### 9.2 請款
 
 | Method | Path | 用途 |
 |---|---|---|
 | `GET` | `/reimbursements` | 查詢請款單 |
+| `POST` | `/reimbursements` | 建立請款單 |
 | `GET` | `/reimbursements/{reimbursementId}` | 查詢請款明細 |
-| `POST` | `/reimbursements/{reimbursementId}:finance-confirm` | 財務確認 |
-| `POST` | `/reimbursements/{reimbursementId}:return` | 財務退回 |
+| `POST` | `/reimbursements/{reimbursementId}/finance-confirm` | 財務確認 |
+| `POST` | `/reimbursements/{reimbursementId}/reject` | 財務退回 |
 
 ### 9.3 財務報表
 
 | Method | Path | 用途 |
 |---|---|---|
-| `GET` | `/finance-reports/income` | 收入報表 |
 | `GET` | `/finance-reports/invoices` | 發票 / 請款彙整 |
 | `GET` | `/finance-reports/payments` | 繳費明細彙整 |
+| `GET` | `/reports/income` | 收入報表 |
 
 ---
 
