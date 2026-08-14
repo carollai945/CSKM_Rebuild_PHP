@@ -16,15 +16,16 @@ class PersonalDataTest extends TestCase
     public function test_authenticated_user_can_get_personal_data(): void
     {
         $user = User::factory()->create(['role' => Role::Staff]);
-        $staff = Staff::factory()->create(['user_id' => $user->id]);
+        $staff = Staff::factory()->create(['user_id' => $user->id, 'join_date' => '2026-02-03']);
         Sanctum::actingAs($user);
 
         $response = $this->getJson('/api/v1/me/personal-data');
 
         $response->assertStatus(200)
             ->assertJsonPath('data.id', $staff->id)
+            ->assertJsonPath('data.join_date', '2026-02-03')
             ->assertJsonPath('data.currentStatus', 'EDITABLE')
-            ->assertJsonStructure(['data' => ['id', 'name', 'currentStatus', 'allowedActions']]);
+            ->assertJsonStructure(['data' => ['id', 'name', 'join_date', 'currentStatus', 'allowedActions']]);
     }
 
     public function test_unauthenticated_cannot_get_personal_data(): void
@@ -35,7 +36,7 @@ class PersonalDataTest extends TestCase
     public function test_authenticated_user_can_update_personal_data(): void
     {
         $user = User::factory()->create(['role' => Role::Staff]);
-        $staff = Staff::factory()->create(['user_id' => $user->id]);
+        $staff = Staff::factory()->create(['user_id' => $user->id, 'join_date' => '2026-02-03']);
         Sanctum::actingAs($user);
 
         $response = $this->putJson('/api/v1/me/personal-data', [
@@ -44,7 +45,9 @@ class PersonalDataTest extends TestCase
             'blood_type' => 'A',
         ]);
 
-        $response->assertStatus(200);
+        $response->assertStatus(200)
+            ->assertJsonPath('data.join_date', '2026-02-03')
+            ->assertJsonPath('data.currentStatus', 'EDITABLE');
         $this->assertDatabaseHas('staff', ['id' => $staff->id, 'phone' => '0912345678']);
     }
 
@@ -57,12 +60,13 @@ class PersonalDataTest extends TestCase
     {
         $adminUser = User::factory()->create(['role' => Role::Admin]);
         $targetUser = User::factory()->create(['role' => Role::Staff]);
-        $target = Staff::factory()->create(['user_id' => $targetUser->id]);
+        $target = Staff::factory()->create(['user_id' => $targetUser->id, 'join_date' => '2026-02-03']);
         Sanctum::actingAs($adminUser);
 
         $response = $this->getJson("/api/v1/staff/{$target->id}/personal-data");
 
         $response->assertStatus(200)
+            ->assertJsonPath('data.join_date', '2026-02-03')
             ->assertJsonPath('data.currentStatus', 'READONLY')
             ->assertJsonPath('data.allowedActions', []);
     }

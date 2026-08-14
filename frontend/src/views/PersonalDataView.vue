@@ -1,28 +1,35 @@
 <template>
   <div class="page">
-    <h2>A00 個人資料維護</h2>
+    <div v-if="isReadonly" class="page-header">
+      <h2>A00 個人資料維護</h2>
+      <RouterLink to="/staff">← 返回人員管理</RouterLink>
+    </div>
+    <h2 v-else>A00 個人資料維護</h2>
     <div class="card">
       <div class="photo-section">
         <img :src="photoPreview || form.photo_url || '/default-avatar.png'" class="avatar" alt="個人照片" />
         <div>
-          <input ref="fileInput" type="file" accept="image/*" style="display:none" @change="onPhotoChange" />
-          <button type="button" @click="(fileInput as HTMLInputElement).click()">更換照片</button>
-          <button v-if="photoFile" type="button" @click="uploadPhoto" style="margin-left:.5rem">上傳</button>
+          <template v-if="!isReadonly">
+            <input ref="fileInput" type="file" accept="image/*" style="display:none" @change="onPhotoChange" />
+            <button type="button" @click="(fileInput as HTMLInputElement).click()">更換照片</button>
+            <button v-if="photoFile" type="button" @click="uploadPhoto" style="margin-left:.5rem">上傳</button>
+          </template>
         </div>
       </div>
       <form @submit.prevent="save">
-        <div class="form-group"><label>姓名</label><input v-model="form.name" placeholder="姓名"/></div>
-        <div class="form-group"><label>電話</label><input v-model="form.phone" placeholder="電話"/></div>
+        <div class="form-group"><label>姓名</label><input v-model="form.name" :readonly="isReadonly" placeholder="姓名"/></div>
+        <div class="form-group"><label>電話</label><input v-model="form.phone" :readonly="isReadonly" placeholder="電話"/></div>
         <div class="form-group"><label>性別</label>
-          <select v-model="form.gender"><option value="">選擇</option><option value="M">男</option><option value="F">女</option></select></div>
+          <select v-model="form.gender" :disabled="isReadonly"><option value="">選擇</option><option value="M">男</option><option value="F">女</option></select></div>
         <div class="form-group"><label>血型</label>
-          <select v-model="form.blood_type"><option value="">選擇</option><option value="A">A</option><option value="B">B</option><option value="AB">AB</option><option value="O">O</option></select></div>
-        <div class="form-group"><label>生日</label><input type="date" v-model="form.birth_date"/></div>
+          <select v-model="form.blood_type" :disabled="isReadonly"><option value="">選擇</option><option value="A">A</option><option value="B">B</option><option value="AB">AB</option><option value="O">O</option></select></div>
+        <div class="form-group"><label>生日</label><input type="date" v-model="form.birth_date" :disabled="isReadonly"/></div>
         <div class="form-group info"><label>員工編號</label><span>{{ form.staff_no }}</span></div>
+        <div class="form-group info"><label>到職日期</label><span>{{ form.join_date || '—' }}</span></div>
         <div class="form-group info"><label>所屬區域</label><span>{{ (form.region as Record<string,unknown>)?.name }}</span></div>
         <div class="form-group info"><label>部門</label><span>{{ (form.department as Record<string,unknown>)?.name }}</span></div>
         <div class="form-group info"><label>職稱</label><span>{{ (form.title as Record<string,unknown>)?.name }}</span></div>
-        <button type="submit">儲存</button>
+        <button v-if="!isReadonly" type="submit">儲存</button>
         <p v-if="msg" style="color:green;margin-top:.5rem">{{ msg }}</p>
         <p v-if="error" style="color:#ff4d4f;margin-top:.5rem">{{ error }}</p>
       </form>
@@ -31,16 +38,34 @@
 </template>
 <script setup lang="ts">
 // 功能編號：A00 個人資料維護
-import { ref, onMounted } from 'vue'
+import { computed, ref, onMounted, watch } from 'vue'
+import { RouterLink, useRoute } from 'vue-router'
 import { personalDataApi } from '@/api/personalData'
+const route = useRoute()
+const isReadonly = computed(() => route.name === 'staff-personal-data-readonly')
+const staffId = computed(() => route.params.id as string | undefined)
 const form = ref<Record<string,unknown>>({})
 const photoFile = ref<File|null>(null)
 const photoPreview = ref<string|null>(null)
 const fileInput = ref<HTMLInputElement|null>(null)
 const msg = ref('')
 const error = ref('')
-async function load() { const r = await personalDataApi.get(); form.value = r.data?.data ?? {} }
-async function save() { await personalDataApi.update(form.value); msg.value='儲存成功'; error.value=''; setTimeout(()=>msg.value='',3000) }
+async function load() {
+  photoFile.value = null
+  photoPreview.value = null
+  const response = isReadonly.value && staffId.value
+    ? await personalDataApi.getByStaffId(staffId.value)
+    : await personalDataApi.get()
+  form.value = response.data?.data ?? {}
+}
+async function save() {
+  if (isReadonly.value) return
+  const response = await personalDataApi.update(form.value)
+  form.value = response.data?.data ?? form.value
+  msg.value='儲存成功'
+  error.value=''
+  setTimeout(()=>msg.value='',3000)
+}
 function onPhotoChange(e: Event) {
   const t = e.target as HTMLInputElement
   photoFile.value = t.files?.[0] ?? null
@@ -48,10 +73,10 @@ function onPhotoChange(e: Event) {
   error.value = ''
 }
 async function uploadPhoto() {
-  if (!photoFile.value) return
+  if (isReadonly.value || !photoFile.value) return
   try {
     const r = await personalDataApi.uploadPhoto(photoFile.value)
-    form.value.photo_url = r.data?.data?.photo_url
+    form.value = { ...form.value, photo_url: r.data?.data?.photo_url }
     photoFile.value = null
     photoPreview.value = null
     if (fileInput.value) fileInput.value.value = ''
@@ -65,12 +90,14 @@ async function uploadPhoto() {
   }
 }
 onMounted(load)
+watch(() => route.fullPath, load)
 </script>
 <style scoped>
-.page{padding:1rem}.card{background:#fff;padding:1.5rem;border-radius:8px;max-width:600px}
+.page{padding:1rem}.page-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}.card{background:#fff;padding:1.5rem;border-radius:8px;max-width:600px}
 .photo-section{display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem}
 .avatar{width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid #d9d9d9;background:#f0f0f0}
 .form-group{margin-bottom:1rem}label{display:block;margin-bottom:.25rem;font-weight:500}
 input,select{width:100%;padding:.5rem;border:1px solid #d9d9d9;border-radius:4px;box-sizing:border-box}
+input[readonly],select:disabled{background:#fafafa;color:#666;cursor:not-allowed}
 .info input,.info span{color:#666;background:#fafafa}button{padding:.5rem 1.5rem;background:#1890ff;color:#fff;border:none;border-radius:4px;cursor:pointer}
 </style>

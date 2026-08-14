@@ -13,6 +13,7 @@
         <tr v-for="row in rows" :key="row.id">
           <td>{{ row.id }}</td><td>{{ row.name }}</td><td>{{ row.status }}</td>
           <td>
+            <button type="button" @click="viewPersonalData(row)" style="background:#13c2c2">個資</button>
             <button @click="edit(row)">編輯</button>
             <button @click="openReset(row)" style="margin-left:.25rem;background:#fa8c16">重設密碼</button>
           </td>
@@ -63,10 +64,12 @@
 <script setup lang="ts">
 // 功能編號：F02 人員管理
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { staffApi } from '@/api/staff'
 import api from '@/api/axios'
 const rows = ref<Record<string,unknown>[]>([])
 const loading = ref(false)
+const router = useRouter()
 const showForm = ref(false)
 const editId = ref<number|null>(null)
 const form = ref<Record<string,unknown>>({ staff_no: '', name: '', abbr: '', join_date: '', status: 'ACTIVE' })
@@ -76,6 +79,10 @@ const resetStaff = ref<Record<string,unknown>|null>(null)
 const resetForm = ref({ new_password: '', new_password_confirmation: '' })
 const resetMsg = ref(''); const resetError = ref('')
 async function load() { loading.value=true; const r = await staffApi.list(); rows.value = r.data?.data?.data ?? r.data?.data ?? []; loading.value=false }
+function viewPersonalData(row: Record<string,unknown>) {
+  if (!row.id) return
+  router.push({ name: 'staff-personal-data-readonly', params: { id: String(row.id) } })
+}
 function edit(row: Record<string,unknown>) {
   editId.value = row.id as number
   formError.value = ''

@@ -63,6 +63,12 @@ const router = createRouter({
         { path: 'students/:id', name: 'student-detail', component: () => import('@/views/StudentDetailView.vue') },
       ],
     },
+    {
+      path: '/staff/:id/personal-data',
+      name: 'staff-personal-data-readonly',
+      component: () => import('@/views/PersonalDataView.vue'),
+      meta: { requiresAuth: true },
+    },
     { path: '/:pathMatch(.*)*', redirect: '/' },
   ],
 })
