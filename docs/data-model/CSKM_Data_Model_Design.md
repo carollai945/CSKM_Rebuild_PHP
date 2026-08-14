@@ -52,6 +52,18 @@
 - `join_date`
 - `leave_date`
 - `status`
+- `phone`
+- `gender`
+- `blood_type`
+- `birth_date`
+- `photo_url`
+- `registered_address`（JSON：戶籍地址）
+- `mailing_address`（JSON：通訊地址與 `same_as_registered`）
+- `language_abilities`（JSON：英 / 日語能力與其他語言明細）
+- `skills`（JSON：一般軟體、程式語言、專業技能、自評能力）
+- `certifications`（JSON：英文檢定、日文檢定、專業證照）
+- `family_information`（JSON：家庭成員與緊急聯絡資訊）
+- `work_experiences`（JSON：多段工作經歷）
 
 ### `staff_role`
 

@@ -28,14 +28,28 @@ class Staff extends Model
         'blood_type',
         'birth_date',
         'photo_url',
+        'registered_address',
+        'mailing_address',
+        'language_abilities',
+        'skills',
+        'certifications',
+        'family_information',
+        'work_experiences',
     ];
 
     protected function casts(): array
     {
         return [
-            'join_date'  => 'date:Y-m-d',
+            'join_date' => 'date:Y-m-d',
             'leave_date' => 'date:Y-m-d',
             'birth_date' => 'date:Y-m-d',
+            'registered_address' => 'array',
+            'mailing_address' => 'array',
+            'language_abilities' => 'array',
+            'skills' => 'array',
+            'certifications' => 'array',
+            'family_information' => 'array',
+            'work_experiences' => 'array',
         ];
     }
 
