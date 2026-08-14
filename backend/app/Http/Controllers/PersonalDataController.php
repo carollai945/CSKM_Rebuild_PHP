@@ -24,7 +24,8 @@ class PersonalDataController extends Controller
             'phone'          => $staff->phone,
             'gender'         => $staff->gender,
             'blood_type'     => $staff->blood_type,
-            'birth_date'     => $staff->birth_date,
+            'birth_date'     => $staff->birth_date?->toDateString(),
+            'join_date'      => $staff->join_date?->toDateString(),
             'photo_url'      => $staff->photo_url,
             'region'         => $staff->region?->only(['id', 'name']),
             'department'     => $staff->department?->only(['id', 'name']),
@@ -56,7 +57,13 @@ class PersonalDataController extends Controller
         $staff = Staff::where('user_id', $request->user()->id)->firstOrFail();
         $staff->update($validated);
 
-        return response()->json(['data' => $staff->fresh()->load(['region', 'department', 'title'])]);
+        return response()->json([
+            'data' => $this->formatStaff(
+                $staff->fresh()->load(['region', 'department', 'title']),
+                'EDITABLE',
+                ['SAVE', 'UPLOAD_PHOTO']
+            ),
+        ]);
     }
 
     public function showByStaffId(Request $request, Staff $staff): JsonResponse
