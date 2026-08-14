@@ -169,17 +169,18 @@
 
 | Method | Path | 用途 |
 |---|---|---|
-| `GET` | `/me/personal-data` | 取得本人個人資料頁所需資料（含血型/性別目前值與照片） |
-| `PUT` | `/me/personal-data` | 更新本人個人資料（不含照片檔案本體） |
+| `GET` | `/me/personal-data` | 取得本人個人資料頁所需資料（含照片、守則連結與巢狀 JSON 區塊） |
+| `PUT` | `/me/personal-data` | 更新本人個人資料（基本資料、地址、語言能力、技能、證照、家庭與工作經歷） |
 | `POST` | `/me/personal-data/photo` | 更新本人照片 |
-| `GET` | `/staff/{staffId}/personal-data?mode=readonly` | 管理者由 F02 帶入時，以唯讀模式檢視指定員工資料 |
+| `GET` | `/staff/{staffId}/personal-data` | 管理者由 F02 帶入時，以唯讀模式檢視指定員工資料 |
 
 #### A00 API 規則
 
-- `/staff/{staffId}/personal-data?mode=readonly` 必須檢查 `STAFF_ADMIN` 或等效權限，且 `allowedActions` 應為空集合
+- `/staff/{staffId}/personal-data` 必須檢查管理權限，且 `allowedActions` 應為空集合
 - `PUT /me/personal-data` 僅可更新登入者自己的個資
+- `PUT /me/personal-data` 應支援 `registered_address`、`mailing_address`、`language_abilities`、`skills`、`certifications`、`family_information`、`work_experiences` 等 JSON 欄位驗證與持久化
 - `POST /me/personal-data/photo` 需檢查檔案格式與大小，並回傳最新照片資源位置
-- 回傳建議包含：`currentStatus`（`EDITABLE` / `READONLY`）與 `allowedActions`（如 `SAVE`、`UPLOAD_PHOTO`）
+- 回傳建議包含：`currentStatus`（`EDITABLE` / `READONLY`）、`allowedActions`（如 `SAVE`、`UPLOAD_PHOTO`）與 `handbook_url`
 
 ### 權限模型建議
 
