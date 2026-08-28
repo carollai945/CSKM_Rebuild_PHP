@@ -5,5 +5,5 @@ export const paymentsApi = {
   create: (d: Record<string,unknown>) => api.post('/payments', d),
   financeConfirm: (id: number) => api.post(`/payments/${id}/finance-confirm`),
   academicConfirm: (id: number) => api.post(`/payments/${id}/academic-confirm`),
-  reject: (id: number) => api.post(`/payments/${id}/reject`),
+  reject: (id: number, note?: string) => api.post(`/payments/${id}/reject`, { note }),
 }

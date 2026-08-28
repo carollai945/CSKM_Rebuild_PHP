@@ -2,7 +2,22 @@
   <div class="page">
     <div class="page-header">
       <h2>C02 學生管理</h2>
-      <button @click="showForm = true">新增</button>
+      <div class="header-actions">
+        <button v-if="canExport" @click="exportExcel">匯出 Excel</button>
+        <button @click="showForm = true">新增</button>
+      </div>
+    </div>
+    <div class="filters">
+      <input v-model="filters.keyword" placeholder="姓名 / 學號 / 電話" @keyup.enter="load" />
+      <select v-model="filters.status" @change="load">
+        <option value="">全部狀態</option>
+        <option value="ACTIVE">在學</option>
+        <option value="INACTIVE">停學</option>
+        <option value="GRADUATED">畢業</option>
+      </select>
+      <input v-model.number="filters.region_id" type="number" min="1" placeholder="區域 ID" @keyup.enter="load" />
+      <button @click="load">搜尋</button>
+      <button @click="resetFilters">清除</button>
     </div>
     <div v-if="loading" class="loading">載入中...</div>
     <table v-else>
@@ -43,20 +58,39 @@
 </template>
 <script setup lang="ts">
 // 功能編號：C02 學生管理
-import { ref, onMounted } from 'vue'
-import { RouterLink } from 'vue-router'
+import { computed, ref, onMounted } from 'vue'
 import { studentsApi } from '@/api/students'
+import { useAuthStore } from '@/stores/auth'
 const rows = ref<Record<string,unknown>[]>([])
 const loading = ref(false)
 const showForm = ref(false)
 const editId = ref<number|null>(null)
 const form = ref<Record<string,unknown>>({})
-async function load() { loading.value = true; const r = await studentsApi.list(); rows.value = r.data?.data?.data ?? r.data?.data ?? []; loading.value = false }
+const filters = ref({ keyword: '', status: '', region_id: '' as number | '' })
+const auth = useAuthStore()
+const canExport = computed(() => {
+  const role = String(auth.user?.role ?? '')
+  return ['admin', 'ceo', 'regmgr'].includes(role)
+})
+async function load() {
+  loading.value = true
+  const params: Record<string, unknown> = {}
+  if (filters.value.keyword) params.keyword = filters.value.keyword
+  if (filters.value.status) params.status = filters.value.status
+  if (filters.value.region_id) params.region_id = filters.value.region_id
+  const r = await studentsApi.list(params)
+  rows.value = r.data?.data?.data ?? r.data?.data ?? []
+  loading.value = false
+}
 function edit(row: Record<string,unknown>) { editId.value = row.id as number; form.value = {...row}; showForm.value = true }
 async function save() { if (editId.value) await studentsApi.update(editId.value, form.value); else await studentsApi.create(form.value); showForm.value = false; editId.value = null; form.value = {}; load() }
 async function remove(id: number) { if (confirm('確認刪除?')) { await studentsApi.delete(id); load() } }
+function resetFilters() { filters.value = { keyword: '', status: '', region_id: '' }; load() }
 async function exportExcel() {
   const params = new URLSearchParams()
+  if (filters.value.keyword) params.set('keyword', filters.value.keyword)
+  if (filters.value.status) params.set('status', filters.value.status)
+  if (filters.value.region_id) params.set('region_id', String(filters.value.region_id))
   const r = await import('@/api/axios').then(m => m.default.get('/students/export', { params, responseType: 'blob' }))
   const url = URL.createObjectURL(new Blob([r.data]))
   const a = document.createElement('a'); a.href = url
@@ -68,6 +102,9 @@ onMounted(load)
 <style scoped>
 .page { padding: 1rem }
 .page-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem }
+.header-actions { display:flex; gap:.5rem }
+.filters { display:flex; gap:.5rem; margin-bottom:1rem; flex-wrap:wrap }
+.filters input,.filters select { padding:.4rem .6rem; border:1px solid #d9d9d9; border-radius:4px }
 table { width:100%; border-collapse:collapse; background:#fff }
 th,td { padding:.6rem 1rem; border-bottom:1px solid #f0f0f0; text-align:left }
 th { background:#fafafa; font-weight:600 }

@@ -4,6 +4,7 @@
     <div class="page-header">
       <div class="filters">
         <input v-model="filters.keyword" placeholder="學生姓名" @keyup.enter="load" />
+        <input v-model.number="filters.student_id" type="number" min="1" placeholder="學生 ID" @keyup.enter="load" />
         <select v-model="filters.status" @change="load">
           <option value="">全部狀態</option>
           <option value="PENDING">待審</option>
@@ -37,6 +38,7 @@
           <td>
             <button v-if="r.status === 'PENDING'" @click="financeConfirm(r.id as number)">財務確認</button>
             <button v-if="r.status === 'FINANCE_CONFIRMED'" @click="academicConfirm(r.id as number)">學務確認</button>
+            <button v-if="r.status === 'PENDING' || r.status === 'FINANCE_CONFIRMED'" class="danger" @click="openReject(r.id as number)">退回</button>
           </td>
         </tr>
       </tbody>
@@ -64,27 +66,43 @@
         </div>
       </div>
     </div>
+
+    <div v-if="rejectTargetId !== null" class="modal-overlay" @click.self="closeReject">
+      <div class="modal">
+        <h3>退回繳費記錄</h3>
+        <label>退回原因<textarea v-model="rejectReason" rows="3" placeholder="請輸入退回原因（選填）"></textarea></label>
+        <div class="modal-actions">
+          <button class="danger" @click="submitReject">確認退回</button>
+          <button @click="closeReject">取消</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 // 功能編號：E00 繳費記錄
 import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import { paymentsApi } from '@/api/payments'
 
 const rows = ref<Record<string,unknown>[]>([])
 const loading = ref(false)
 const page = ref(1)
 const lastPage = ref(1)
+const route = useRoute()
 
-const filters = ref({ keyword: '', status: '', from: '', to: '' })
+const filters = ref({ keyword: '', student_id: '' as number | '', status: '', from: '', to: '' })
 const showCreate = ref(false)
 const form = ref({ student_id: 0, fee_item_id: 0 as number|null, amount: 0, currency: 'TWD', payment_method: '', payment_date: '', note: '' })
+const rejectTargetId = ref<number | null>(null)
+const rejectReason = ref('')
 
 async function load() {
   loading.value = true
   const params: Record<string,unknown> = { page: page.value }
   if (filters.value.keyword) params.keyword = filters.value.keyword
+  if (filters.value.student_id) params.student_id = filters.value.student_id
   if (filters.value.status) params.status = filters.value.status
   if (filters.value.from) params.from = filters.value.from
   if (filters.value.to) params.to = filters.value.to
@@ -96,7 +114,7 @@ async function load() {
 }
 
 function resetFilters() {
-  filters.value = { keyword: '', status: '', from: '', to: '' }
+  filters.value = { keyword: '', student_id: '', status: '', from: '', to: '' }
   page.value = 1
   load()
 }
@@ -114,6 +132,14 @@ async function submitCreate() {
 
 async function financeConfirm(id: number) { await paymentsApi.financeConfirm(id); load() }
 async function academicConfirm(id: number) { await paymentsApi.academicConfirm(id); load() }
+function openReject(id: number) { rejectTargetId.value = id; rejectReason.value = '' }
+function closeReject() { rejectTargetId.value = null; rejectReason.value = '' }
+async function submitReject() {
+  if (rejectTargetId.value === null) return
+  await paymentsApi.reject(rejectTargetId.value, rejectReason.value)
+  closeReject()
+  load()
+}
 
 function statusLabel(s: string) {
   const map: Record<string,string> = {
@@ -123,7 +149,13 @@ function statusLabel(s: string) {
   return map[s] ?? s
 }
 
-onMounted(load)
+onMounted(() => {
+  const queryStudentId = route.query.student_id ? Number(route.query.student_id) : NaN
+  if (!Number.isNaN(queryStudentId) && queryStudentId > 0) {
+    filters.value.student_id = queryStudentId
+  }
+  load()
+})
 </script>
 
 <style scoped>
@@ -135,6 +167,7 @@ table { width:100%;border-collapse:collapse;background:#fff }
 th,td { padding:.6rem 1rem;border-bottom:1px solid #f0f0f0;text-align:left }
 th { background:#fafafa;font-weight:600 }
 button { padding:.4rem 1rem;background:#1890ff;color:#fff;border:none;border-radius:4px;cursor:pointer }
+button.danger { background:#ff4d4f }
 button:disabled { opacity:.5;cursor:not-allowed }
 .pagination { display:flex;align-items:center;gap:1rem;margin-top:1rem }
 .status-PENDING { color:#fa8c16 }

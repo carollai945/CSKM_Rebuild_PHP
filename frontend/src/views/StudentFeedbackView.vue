@@ -7,6 +7,7 @@
 
     <!-- 篩選條件 -->
     <div class="filters">
+      <input v-model.number="filters.student_id" type="number" min="1" placeholder="學員 ID" @change="load" />
       <input v-model="filters.keyword" placeholder="學員姓名搜尋" @change="load" />
       <select v-model="filters.status" @change="load">
         <option value="">全部狀態</option>
@@ -60,6 +61,7 @@
 <script setup lang="ts">
 // 功能編號：D04 學員意見管理
 import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import { RouterLink } from 'vue-router'
 import { studentFeedbacksApi as feedbackApi } from '@/api/studentFeedbacks'
 
@@ -67,11 +69,13 @@ const rows = ref<Record<string, unknown>[]>([])
 const loading = ref(false)
 const showForm = ref(false)
 const form = ref<Record<string, unknown>>({})
-const filters = ref({ keyword: '', status: '', from: '', to: '' })
+const filters = ref({ student_id: '' as number | '', keyword: '', status: '', from: '', to: '' })
+const route = useRoute()
 
 async function load() {
   loading.value = true
   const params: Record<string, unknown> = {}
+  if (filters.value.student_id) params.student_id = filters.value.student_id
   if (filters.value.keyword) params.keyword = filters.value.keyword
   if (filters.value.status) params.status = filters.value.status
   if (filters.value.from) params.from = filters.value.from
@@ -81,14 +85,18 @@ async function load() {
   loading.value = false
 }
 
-function resetFilters() { filters.value = { keyword: '', status: '', from: '', to: '' }; load() }
+function resetFilters() { filters.value = { student_id: '', keyword: '', status: '', from: '', to: '' }; load() }
 function openCreate() { form.value = {}; showForm.value = true }
 async function save() { await feedbackApi.create(form.value); showForm.value = false; load() }
 async function remove(id: number) { if (confirm('確認刪除?')) { await feedbackApi.delete(id); load() } }
 function statusLabel(s: string) {
   return { OPEN: '待處理', IN_PROGRESS: '處理中', RESOLVED: '已結案' }[s] ?? s
 }
-onMounted(load)
+onMounted(() => {
+  const studentId = route.query.student_id ? Number(route.query.student_id) : NaN
+  if (!Number.isNaN(studentId) && studentId > 0) filters.value.student_id = studentId
+  load()
+})
 </script>
 <style scoped>
 .page { padding: 1rem }

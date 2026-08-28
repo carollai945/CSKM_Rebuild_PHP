@@ -18,6 +18,8 @@ class ReportController extends Controller {
         $query = Report::where('staff_id', $staffId)
             ->when($request->report_type, fn($q,$v) => $q->where('report_type',$v))
             ->when($request->status, fn($q,$v) => $q->where('status',$v))
+            ->when($request->from, fn($q,$v) => $q->whereDate('report_date', '>=', $v))
+            ->when($request->to, fn($q,$v) => $q->whereDate('report_date', '<=', $v))
             ->orderByDesc('report_date')
             ->orderByDesc('id');
         return response()->json(['data' => $query->paginate(20)]);

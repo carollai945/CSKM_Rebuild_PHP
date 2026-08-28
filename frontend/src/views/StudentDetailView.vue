@@ -77,6 +77,7 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
 import api from '@/api/axios'
+import { studentsApi } from '@/api/students'
 const route = useRoute()
 const studentId = route.params.id as string
 const loading = ref(false)
@@ -96,10 +97,13 @@ async function load() {
   ])
   const d = student.data?.data ?? {}
   form.value = { ...d }
+  selectedInstitute.value = Number((d.institute_id as number | undefined) ?? 0) || null
   institutes.value = instResp.data?.data ?? []
   staffList.value = staffResp.data?.data ?? []
-  const coursesResp = await api.get(`/students/${studentId}/courses`)
-  selectedCourses.value = (coursesResp.data?.data ?? []).map((c: Record<string,unknown>) => c.id as number)
+  const coursesResp = await studentsApi.getCourses(Number(studentId))
+  const courseRows = coursesResp.data?.data ?? []
+  selectedCourses.value = courseRows.map((c: Record<string,unknown>) => Number(c.course_id))
+  if (selectedInstitute.value) await onInstituteChange()
   loading.value=false
 }
 async function onInstituteChange() {
@@ -109,9 +113,10 @@ async function onInstituteChange() {
 }
 async function save() {
   try {
+    const coursesPayload = selectedCourses.value.map((courseId) => ({ course_id: courseId, status: 'ENROLLED' }))
     await Promise.all([
       api.put(`/students/${studentId}`, form.value),
-      api.put(`/students/${studentId}/courses`, { course_ids: selectedCourses.value }),
+      studentsApi.updateCourses(Number(studentId), { courses: coursesPayload }),
     ])
     msg.value='儲存成功'; error.value=''; setTimeout(()=>msg.value='',3000)
   } catch(e: unknown) {
