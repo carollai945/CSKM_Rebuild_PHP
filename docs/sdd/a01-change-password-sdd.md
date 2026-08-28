@@ -1,5 +1,9 @@
 # A01 修改密碼 SDD
 
+## 對應頁面設計
+
+- `page-design/a01-change-password-page-design.md`
+
 ## 1. 對應需求
 
 - Story：`A01-1`

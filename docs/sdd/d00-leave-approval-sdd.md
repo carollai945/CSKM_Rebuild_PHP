@@ -1,5 +1,9 @@
 # D00 請假審核 SDD
 
+## 對應頁面設計
+
+- `page-design/d00-leave-approval-page-design.md`
+
 ## 1. 對應需求
 
 - Story：`D00-1`

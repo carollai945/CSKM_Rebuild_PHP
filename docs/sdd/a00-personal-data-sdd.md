@@ -1,5 +1,9 @@
 # A00 個人資料維護 SDD
 
+## 對應頁面設計
+
+- `page-design/a00-personal-data-page-design.md`
+
 ## 1. 對應需求
 
 - Story：`A00-1`、`A00-2`

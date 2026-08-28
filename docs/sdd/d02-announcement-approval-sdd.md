@@ -1,5 +1,9 @@
 # D02 公告審核 SDD
 
+## 對應頁面設計
+
+- `page-design/d02-announcement-approval-page-design.md`
+
 ## 1. 對應需求
 
 - Story：`D02-1`

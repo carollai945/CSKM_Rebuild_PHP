@@ -1,5 +1,9 @@
 # E02 請款清單 SDD
 
+## 對應頁面設計
+
+- `page-design/e02-invoice-list-page-design.md`
+
 ## 1. 對應需求
 
 - Story：`E02-1`

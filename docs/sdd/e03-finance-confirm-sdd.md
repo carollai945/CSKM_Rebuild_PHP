@@ -1,5 +1,9 @@
 # E03 財務確認 SDD
 
+## 對應頁面設計
+
+- `page-design/e03-finance-confirm-page-design.md`
+
 ## 1. 對應需求
 
 - Story：`E03-1`

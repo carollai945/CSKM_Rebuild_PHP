@@ -1,5 +1,9 @@
 # D01 簽呈批核 — 系統設計文件 (SDD)
 
+## 對應頁面設計
+
+- `page-design/d01-petition-approval-page-design.md`
+
 ## 1. 功能概述
 
 提供主管與 CEO 查看、核准或退回員工簽呈申請的功能。

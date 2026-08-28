@@ -1,5 +1,9 @@
 # A02 個人報表入口 SDD
 
+## 對應頁面設計
+
+- `page-design/a02-personal-report-page-design.md`
+
 ## 1. 對應需求
 
 - Story：`A02-1`

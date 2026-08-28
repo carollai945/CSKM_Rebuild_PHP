@@ -1,5 +1,9 @@
 # F01 部門與職稱管理 SDD
 
+## 對應頁面設計
+
+- `page-design/f01-department-title-page-design.md`
+
 ## 1. 對應需求
 
 - Story：`F01-1`

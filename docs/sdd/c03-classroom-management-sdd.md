@@ -1,5 +1,9 @@
 # C03 教室管理 SDD
 
+## 對應頁面設計
+
+- `page-design/c03-classroom-management-page-design.md`
+
 ## 1. 對應需求
 
 - Story：`C03-1`

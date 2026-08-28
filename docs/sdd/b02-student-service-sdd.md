@@ -1,5 +1,9 @@
 # B02 學員服務管理 SDD
 
+## 對應頁面設計
+
+- `page-design/b02-student-service-page-design.md`
+
 ## 1. 對應需求
 
 - Story：`B02-1`

@@ -1,5 +1,13 @@
 # 教務主資料管理 SDD
 
+## 對應頁面設計
+
+- `page-design/c00-course-setup-page-design.md`
+- `page-design/c01-professor-page-design.md`
+- `page-design/c02-student-page-design.md`
+- `page-design/c03-classroom-management-page-design.md`
+- `page-design/c05-fee-item-page-design.md`
+
 ## 對應 Story
 
 - C00-1、C01-1、C01-2、C02-1、C02-2、C02-3、C03-1、C05-1

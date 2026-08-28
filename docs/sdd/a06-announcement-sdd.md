@@ -1,5 +1,9 @@
 # A06 公告管理 SDD
 
+## 對應頁面設計
+
+- `page-design/a06-announcement-page-design.md`
+
 ## 1. 對應需求
 
 - Story：`A06-1`、`A06-2`

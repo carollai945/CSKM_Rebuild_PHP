@@ -1,5 +1,9 @@
 # F02 人員帳號與權限管理 SDD
 
+## 對應頁面設計
+
+- `page-design/f02-permission-management-page-design.md`
+
 ## 1. 對應需求
 
 - Story：`F02-2`、`F02-3`、關聯 `F02-4`
