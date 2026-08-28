@@ -45,10 +45,37 @@ class PaymentTest extends TestCase {
         $this->postJson("/api/v1/payments/{$p->id}/academic-confirm")->assertStatus(422);
     }
 
+    public function test_staff_cannot_finance_confirm_payment(): void {
+        $staffUser = User::factory()->create(['role' => Role::Staff]);
+        Staff::factory()->create(['user_id' => $staffUser->id]);
+        Sanctum::actingAs($staffUser);
+        $p = Payment::create(['student_id'=>$this->student->id,'amount'=>1000]);
+
+        $this->postJson("/api/v1/payments/{$p->id}/finance-confirm")->assertStatus(403);
+    }
+
+    public function test_finance_cannot_academic_confirm_payment(): void {
+        $financeUser = User::factory()->create(['role' => Role::Finance]);
+        Staff::factory()->create(['user_id' => $financeUser->id]);
+        Sanctum::actingAs($financeUser);
+        $p = Payment::create(['student_id'=>$this->student->id,'amount'=>1000,'status'=>'FINANCE_CONFIRMED']);
+
+        $this->postJson("/api/v1/payments/{$p->id}/academic-confirm")->assertStatus(403);
+    }
+
     public function test_can_reject_payment(): void {
         $p = Payment::create(['student_id'=>$this->student->id,'amount'=>1000]);
         $this->postJson("/api/v1/payments/{$p->id}/reject",['note'=>'資料不符'])
             ->assertStatus(200)->assertJsonPath('data.status','REJECTED');
+    }
+
+    public function test_staff_cannot_reject_payment(): void {
+        $staffUser = User::factory()->create(['role' => Role::Staff]);
+        Staff::factory()->create(['user_id' => $staffUser->id]);
+        Sanctum::actingAs($staffUser);
+        $p = Payment::create(['student_id'=>$this->student->id,'amount'=>1000]);
+
+        $this->postJson("/api/v1/payments/{$p->id}/reject",['note'=>'資料不符'])->assertStatus(403);
     }
 
     public function test_unauthenticated_cannot_access(): void {

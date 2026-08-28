@@ -15,7 +15,6 @@
           <div class="hero-meta">
             <div><strong>{{ form.name || '未命名員工' }}</strong></div>
             <div class="meta-line">員工編號：{{ form.staff_no || '—' }}</div>
-            <div class="meta-line">到職日期：{{ form.join_date || '—' }}</div>
             <div class="meta-line">組織：{{ regionName }} / {{ departmentName }} / {{ titleName }}</div>
           </div>
           <div class="action-row">
@@ -61,6 +60,7 @@
           <div class="form-group"><label>生日</label><input type="date" v-model="form.birth_date" :disabled="isReadonly" /></div>
           <div class="form-group info"><label>狀態</label><span>{{ form.status || '—' }}</span></div>
           <div class="form-group info"><label>員工編號</label><span>{{ form.staff_no || '—' }}</span></div>
+          <div class="form-group info"><label>到職日期</label><span>{{ form.join_date || '—' }}</span></div>
           <div class="form-group info"><label>所屬區域</label><span>{{ regionName }}</span></div>
           <div class="form-group info"><label>部門</label><span>{{ departmentName }}</span></div>
           <div class="form-group info"><label>職稱</label><span>{{ titleName }}</span></div>

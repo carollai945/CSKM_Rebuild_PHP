@@ -4,52 +4,52 @@
       <div class="sidebar-title">CSKM 管理系統</div>
       <nav>
         <RouterLink to="/dashboard">📊 儀表板</RouterLink>
-        <RouterLink to="/messages" class="message-link">
+        <RouterLink v-if="canAccess('A03')" to="/messages" class="message-link">
           <span>📨 訊息中心</span>
           <span v-if="unreadCount > 0" class="badge">{{ unreadCount }}</span>
         </RouterLink>
         <div class="nav-group">個人</div>
-        <RouterLink to="/me/personal-data">👤 個人資料</RouterLink>
-        <RouterLink to="/me/change-password">🔑 修改密碼</RouterLink>
-        <RouterLink to="/me/reports">📋 個人報表</RouterLink>
+        <RouterLink v-if="canAccess('A00')" to="/me/personal-data">👤 個人資料</RouterLink>
+        <RouterLink v-if="canAccess('A01')" to="/me/change-password">🔑 修改密碼</RouterLink>
+        <RouterLink v-if="canAccess('A02')" to="/me/reports">📋 個人報表</RouterLink>
         <div class="nav-group">申請單</div>
-        <RouterLink to="/applications/leave-requests">🏖 請假申請</RouterLink>
-        <RouterLink to="/applications/petitions">📝 簽呈申請</RouterLink>
-        <RouterLink to="/applications/invoice-requests">💳 請款單</RouterLink>
-        <RouterLink to="/applications/announcements">📢 公告管理</RouterLink>
+        <RouterLink v-if="canAccess('B00')" to="/applications/leave-requests">🏖 請假申請</RouterLink>
+        <RouterLink v-if="canAccess('B01')" to="/applications/petitions">📝 簽呈申請</RouterLink>
+        <RouterLink v-if="canAccess('E03')" to="/applications/invoice-requests">💳 請款單</RouterLink>
+        <RouterLink v-if="canAccess('B02')" to="/applications/announcements">📢 公告管理</RouterLink>
         <div class="nav-group">審核</div>
-        <RouterLink to="/approvals/leave-requests">✅ 請假批核</RouterLink>
-        <RouterLink to="/approvals/petitions">✅ 簽呈批核</RouterLink>
-        <RouterLink to="/approvals/announcements">✅ 公告批核</RouterLink>
-        <RouterLink to="/approvals/reports">✅ 報表批核</RouterLink>
+        <RouterLink v-if="canAccess('D00')" to="/approvals/leave-requests">✅ 請假批核</RouterLink>
+        <RouterLink v-if="canAccess('D01')" to="/approvals/petitions">✅ 簽呈批核</RouterLink>
+        <RouterLink v-if="canAccess('D02')" to="/approvals/announcements">✅ 公告批核</RouterLink>
+        <RouterLink v-if="canAccess('D03')" to="/approvals/reports">✅ 報表批核</RouterLink>
         <div class="nav-group">學員</div>
-        <RouterLink to="/students">🎓 學員管理</RouterLink>
-        <RouterLink to="/students/assign">📌 學員分配</RouterLink>
-        <RouterLink to="/student-services">🛎 服務紀錄</RouterLink>
-        <RouterLink to="/student-feedbacks">💬 學員意見</RouterLink>
+        <RouterLink v-if="canAccess('C02')" to="/students">🎓 學員管理</RouterLink>
+        <RouterLink v-if="canAccess('C04')" to="/students/assign">📌 學員分配</RouterLink>
+        <RouterLink v-if="canAccess('C03')" to="/student-services">🛎 服務紀錄</RouterLink>
+        <RouterLink v-if="canAccess('C05')" to="/student-feedbacks">💬 學員意見</RouterLink>
         <div class="nav-group">電訪</div>
-        <RouterLink to="/leads">📞 電訪名單</RouterLink>
-        <RouterLink to="/leads/interviews">🗒 電訪紀錄</RouterLink>
-        <RouterLink to="/leads/import">📥 名單匯入</RouterLink>
+        <RouterLink v-if="canAccess('F03')" to="/leads">📞 電訪名單</RouterLink>
+        <RouterLink v-if="canAccess('F03')" to="/leads/interviews">🗒 電訪紀錄</RouterLink>
+        <RouterLink v-if="canAccess('F04')" to="/leads/import">📥 名單匯入</RouterLink>
         <div class="nav-group">財務</div>
-        <RouterLink to="/payments">💰 繳費記錄</RouterLink>
-        <RouterLink to="/reports/income">📈 收入報表</RouterLink>
-        <RouterLink to="/reimbursements">🧾 請款列表</RouterLink>
-        <RouterLink to="/reimbursements/finance-confirm">🏦 財務確認</RouterLink>
+        <RouterLink v-if="canAccess('E00')" to="/payments">💰 繳費記錄</RouterLink>
+        <RouterLink v-if="canAccess('E01')" to="/reports/income">📈 收入報表</RouterLink>
+        <RouterLink v-if="canAccess('E02')" to="/reimbursements">🧾 請款列表</RouterLink>
+        <RouterLink v-if="canAccess('E02')" to="/reimbursements/finance-confirm">🏦 財務確認</RouterLink>
         <div class="nav-group">學術</div>
-        <RouterLink to="/academic/settings">⚙️ 課程設定</RouterLink>
-        <RouterLink to="/academic/professors">👩‍🏫 師資管理</RouterLink>
-        <RouterLink to="/academic/classrooms">🏫 教室管理</RouterLink>
-        <RouterLink to="/academic/fee-items">💵 費用項目</RouterLink>
+        <RouterLink v-if="canAccess('C00')" to="/academic/settings">⚙️ 課程設定</RouterLink>
+        <RouterLink v-if="canAccess('C01')" to="/academic/professors">👩‍🏫 師資管理</RouterLink>
+        <RouterLink v-if="canAccess('C00')" to="/academic/classrooms">🏫 教室管理</RouterLink>
+        <RouterLink v-if="canAccess('C00')" to="/academic/fee-items">💵 費用項目</RouterLink>
         <div class="nav-group">人員</div>
-        <RouterLink to="/staff">👥 人員管理</RouterLink>
-        <RouterLink to="/staff/list">📄 人員列表</RouterLink>
-        <RouterLink to="/staff">🔐 權限管理</RouterLink>
+        <RouterLink v-if="canAccess('F02')" to="/staff">👥 人員管理</RouterLink>
+        <RouterLink v-if="canAccess('F05')" to="/staff/list">📄 人員列表</RouterLink>
+        <RouterLink v-if="canAccess('F02')" to="/staff">🔐 權限管理</RouterLink>
         <div class="nav-group">基本設定</div>
-        <RouterLink to="/master/regions">🌏 區域管理</RouterLink>
-        <RouterLink to="/master/departments">🏢 部門職稱</RouterLink>
+        <RouterLink v-if="canAccess('F01')" to="/master/regions">🌏 區域管理</RouterLink>
+        <RouterLink v-if="canAccess('F01')" to="/master/departments">🏢 部門職稱</RouterLink>
         <div class="nav-group">系統</div>
-        <RouterLink to="/system/backup">💾 資料庫備份</RouterLink>
+        <RouterLink v-if="canAccess('F00')" to="/system/backup">💾 資料庫備份</RouterLink>
         <a href="#" @click.prevent="logout">🚪 登出</a>
       </nav>
     </aside>
@@ -79,9 +79,9 @@ const unreadCount = ref(0)
 function getReadIds() {
   try {
     const ids = JSON.parse(localStorage.getItem(READ_KEY) ?? '[]')
-    return new Set(Array.isArray(ids) ? ids.map((id) => Number(id)) : [])
+    return new Set(Array.isArray(ids) ? ids.map((id) => String(id)) : [])
   } catch {
-    return new Set<number>()
+    return new Set<string>()
   }
 }
 
@@ -89,7 +89,10 @@ async function loadUnreadCount() {
   const response = await getMessages()
   const rows = response.data?.data?.announcements ?? []
   const readIds = getReadIds()
-  unreadCount.value = rows.filter((row: Record<string, unknown>) => !readIds.has(Number(row.id))).length
+  unreadCount.value = rows.filter((row: Record<string, unknown>) => {
+    const id = String(row.id ?? '')
+    return !readIds.has(id) && !readIds.has(`announcement-${id}`)
+  }).length
 }
 
 function onReadUpdated() {
@@ -104,6 +107,7 @@ async function logout() {
 }
 
 onMounted(() => {
+  permission.ensureLoaded()
   loadUnreadCount()
   window.addEventListener('messages-read-updated', onReadUpdated)
 })

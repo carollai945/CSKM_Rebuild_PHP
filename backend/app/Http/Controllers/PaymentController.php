@@ -1,10 +1,12 @@
 <?php
 namespace App\Http\Controllers;
+use App\Enums\Role;
 use App\Models\Payment;
 use App\Models\Staff;
 use App\Models\Student;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 /**
  * E00 繳費記錄
@@ -43,6 +45,7 @@ class PaymentController extends Controller {
     }
 
     public function financeConfirm(Request $request, Payment $payment): JsonResponse {
+        Gate::authorize('is-finance-report');
         abort_if($payment->status !== 'PENDING', 422, '只能確認待審狀態的繳費記錄。');
         $staffId = Staff::where('user_id', $request->user()->id)->value('id');
         $payment->update(['status'=>'FINANCE_CONFIRMED','finance_confirmed_by'=>$staffId]);
@@ -50,6 +53,8 @@ class PaymentController extends Controller {
     }
 
     public function academicConfirm(Request $request, Payment $payment): JsonResponse {
+        $role = $request->user()?->role;
+        abort_unless(in_array($role, [Role::Admin, Role::CEO, Role::RegMgr, Role::Teacher], true), 403);
         abort_if($payment->status !== 'FINANCE_CONFIRMED', 422, '請先完成財務確認。');
         $staffId = Staff::where('user_id', $request->user()->id)->value('id');
         $payment->update(['status'=>'ACADEMIC_CONFIRMED','academic_confirmed_by'=>$staffId]);
@@ -57,6 +62,8 @@ class PaymentController extends Controller {
     }
 
     public function reject(Request $request, Payment $payment): JsonResponse {
+        $role = $request->user()?->role;
+        abort_unless(in_array($role, [Role::Admin, Role::CEO, Role::RegMgr, Role::Finance, Role::Teacher], true), 403);
         abort_if(!in_array($payment->status,['PENDING','FINANCE_CONFIRMED']), 422, '無法退回此狀態的繳費記錄。');
         $validated = $request->validate(['note'=>'nullable|string']);
         $payment->update(['status'=>'REJECTED','note'=>$validated['note'] ?? $payment->note]);

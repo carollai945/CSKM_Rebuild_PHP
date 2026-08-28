@@ -36,9 +36,9 @@
           <td><span :class="'status-' + r.status">{{ statusLabel(r.status as string) }}</span></td>
           <td>{{ r.note ?? '-' }}</td>
           <td>
-            <button v-if="r.status === 'PENDING'" @click="financeConfirm(r.id as number)">財務確認</button>
-            <button v-if="r.status === 'FINANCE_CONFIRMED'" @click="academicConfirm(r.id as number)">學務確認</button>
-            <button v-if="r.status === 'PENDING' || r.status === 'FINANCE_CONFIRMED'" class="danger" @click="openReject(r.id as number)">退回</button>
+            <button v-if="r.status === 'PENDING' && canFinanceAction" @click="financeConfirm(r.id as number)">財務確認</button>
+            <button v-if="r.status === 'FINANCE_CONFIRMED' && canAcademicAction" @click="academicConfirm(r.id as number)">學務確認</button>
+            <button v-if="(r.status === 'PENDING' || r.status === 'FINANCE_CONFIRMED') && canRejectAction" class="danger" @click="openReject(r.id as number)">退回</button>
           </td>
         </tr>
       </tbody>
@@ -82,15 +82,21 @@
 
 <script setup lang="ts">
 // 功能編號：E00 繳費記錄
-import { ref, onMounted } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { paymentsApi } from '@/api/payments'
+import { useAuthStore } from '@/stores/auth'
 
 const rows = ref<Record<string,unknown>[]>([])
 const loading = ref(false)
 const page = ref(1)
 const lastPage = ref(1)
 const route = useRoute()
+const auth = useAuthStore()
+const currentRole = computed(() => String(auth.user?.role ?? '').toLowerCase())
+const canFinanceAction = computed(() => ['admin', 'ceo', 'finance'].includes(currentRole.value))
+const canAcademicAction = computed(() => ['admin', 'ceo', 'regmgr', 'teacher'].includes(currentRole.value))
+const canRejectAction = computed(() => ['admin', 'ceo', 'regmgr', 'finance', 'teacher'].includes(currentRole.value))
 
 const filters = ref({ keyword: '', student_id: '' as number | '', status: '', from: '', to: '' })
 const showCreate = ref(false)

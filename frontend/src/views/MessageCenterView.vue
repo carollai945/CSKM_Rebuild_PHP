@@ -1,26 +1,42 @@
 <template>
   <div class="page">
     <h2>訊息中心</h2>
+    <div class="toolbar">
+      <div class="tabs">
+        <button
+          v-for="tab in tabs"
+          :key="tab.key"
+          type="button"
+          class="tab"
+          :class="{ active: activeTab === tab.key }"
+          @click="activeTab = tab.key"
+        >
+          {{ tab.label }}
+          <span v-if="tab.count > 0" class="count">{{ tab.count }}</span>
+        </button>
+      </div>
+      <input v-model.trim="keyword" type="text" placeholder="關鍵字搜尋標題或內容" />
+    </div>
 
     <div v-if="loading" class="state">載入中...</div>
-    <div v-else-if="messages.length === 0" class="state">目前沒有訊息</div>
+    <div v-else-if="filteredMessages.length === 0" class="state">目前沒有訊息</div>
 
     <div v-else class="message-list">
       <button
-        v-for="message in messages"
-        :key="message.id"
+        v-for="message in filteredMessages"
+        :key="message.key"
         type="button"
         class="message-item"
-        :class="{ unread: !isRead(message.id) }"
-        @click="read(message.id)"
+        :class="{ unread: !isRead(message.key) }"
+        @click="markRead(message)"
       >
         <div class="message-header">
           <span class="message-title">{{ message.title }}</span>
-          <span class="message-time">{{ formatTime(message.created_at) }}</span>
+          <span class="message-time">{{ message.created_at ? formatTime(message.created_at) : '' }}</span>
         </div>
         <div class="message-content">{{ summary(message.content) }}</div>
-        <span class="message-status" :class="{ unread: !isRead(message.id) }">
-          {{ isRead(message.id) ? '已讀' : '未讀' }}
+        <span class="message-status" :class="{ unread: !isRead(message.key) }">
+          {{ isRead(message.key) ? '已讀' : '未讀' }}
         </span>
       </button>
     </div>
@@ -28,11 +44,14 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { getMessages, markMessageRead } from '@/api/messages'
 
-type MessageItem = {
-  id: number
+type TabKey = 'announcement' | 'leave' | 'report' | 'petition' | 'invoice'
+type MessageListItem = {
+  key: string
+  category: TabKey
+  announcementId?: number
   title: string
   content: string
   created_at?: string
@@ -40,13 +59,16 @@ type MessageItem = {
 
 const READ_KEY = 'message_read_ids'
 const loading = ref(false)
-const messages = ref<MessageItem[]>([])
-const readIds = ref<Set<number>>(new Set())
+const keyword = ref('')
+const activeTab = ref<TabKey>('announcement')
+const announcements = ref<MessageListItem[]>([])
+const pendingCounts = ref({ leave_requests: 0, reports: 0, petitions: 0, invoice_requests: 0 })
+const readIds = ref<Set<string>>(new Set())
 
 function loadReadIds() {
   try {
     const ids = JSON.parse(localStorage.getItem(READ_KEY) ?? '[]')
-    readIds.value = new Set(Array.isArray(ids) ? ids.map((id) => Number(id)) : [])
+    readIds.value = new Set(Array.isArray(ids) ? ids.map((id) => String(id)) : [])
   } catch {
     readIds.value = new Set()
   }
@@ -57,7 +79,7 @@ function saveReadIds() {
   window.dispatchEvent(new Event('messages-read-updated'))
 }
 
-function isRead(id: number) {
+function isRead(id: string) {
   return readIds.value.has(id)
 }
 
@@ -73,22 +95,84 @@ async function load() {
   loading.value = true
   loadReadIds()
   const response = await getMessages()
-  const rows = response.data?.data?.announcements ?? []
-  messages.value = rows.map((row: Record<string, unknown>) => ({
-    id: Number(row.id),
+  const payload = response.data?.data ?? {}
+  const rows = payload.announcements ?? []
+  announcements.value = rows.map((row: Record<string, unknown>) => ({
+    key: `announcement-${String(row.id ?? '')}`,
+    category: 'announcement',
+    announcementId: Number(row.id),
     title: String(row.title ?? ''),
     content: String(row.content ?? ''),
     created_at: typeof row.created_at === 'string' ? row.created_at : undefined,
   }))
+  pendingCounts.value = {
+    leave_requests: Number(payload.pending_counts?.leave_requests ?? 0),
+    reports: Number(payload.pending_counts?.reports ?? 0),
+    petitions: Number(payload.pending_counts?.petitions ?? 0),
+    invoice_requests: Number(payload.pending_counts?.invoice_requests ?? 0),
+  }
   loading.value = false
 }
 
-async function read(id: number) {
-  if (isRead(id)) return
-  await markMessageRead(id)
-  readIds.value.add(id)
+async function markRead(message: MessageListItem) {
+  if (isRead(message.key)) return
+  if (message.announcementId) {
+    await markMessageRead(message.announcementId)
+    readIds.value.add(String(message.announcementId))
+  }
+  readIds.value.add(message.key)
   saveReadIds()
 }
+
+const tabs = computed(() => [
+  { key: 'announcement' as TabKey, label: '公告', count: announcements.value.length },
+  { key: 'leave' as TabKey, label: '假單', count: pendingCounts.value.leave_requests },
+  { key: 'report' as TabKey, label: '報表', count: pendingCounts.value.reports },
+  { key: 'petition' as TabKey, label: '簽呈', count: pendingCounts.value.petitions },
+  { key: 'invoice' as TabKey, label: '請款', count: pendingCounts.value.invoice_requests },
+])
+
+const categoryMessages = computed<MessageListItem[]>(() => {
+  if (activeTab.value === 'announcement') return announcements.value
+  if (activeTab.value === 'leave') {
+    return [{
+      key: 'pending-leave',
+      category: 'leave',
+      title: '假單待處理通知',
+      content: `目前待處理假單共 ${pendingCounts.value.leave_requests} 筆。`,
+    }]
+  }
+  if (activeTab.value === 'report') {
+    return [{
+      key: 'pending-report',
+      category: 'report',
+      title: '報表待審通知',
+      content: `目前待審報表共 ${pendingCounts.value.reports} 筆。`,
+    }]
+  }
+  if (activeTab.value === 'petition') {
+    return [{
+      key: 'pending-petition',
+      category: 'petition',
+      title: '簽呈待審通知',
+      content: `目前待審簽呈共 ${pendingCounts.value.petitions} 筆。`,
+    }]
+  }
+  return [{
+    key: 'pending-invoice',
+    category: 'invoice',
+    title: '請款待審通知',
+    content: `目前待審請款共 ${pendingCounts.value.invoice_requests} 筆。`,
+  }]
+})
+
+const filteredMessages = computed(() => {
+  const query = keyword.value.toLowerCase()
+  if (!query) return categoryMessages.value
+  return categoryMessages.value.filter((message) =>
+    message.title.toLowerCase().includes(query) || message.content.toLowerCase().includes(query),
+  )
+})
 
 onMounted(load)
 </script>
@@ -96,6 +180,12 @@ onMounted(load)
 <style scoped>
 .page { padding: 1rem; }
 .state { color: #8c8c8c; padding: 1rem 0; }
+.toolbar { display: flex; justify-content: space-between; align-items: center; gap: .75rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.tabs { display: flex; gap: .5rem; flex-wrap: wrap; }
+.tab { border: 1px solid #d9d9d9; background: #fff; color: #333; border-radius: 999px; padding: .35rem .75rem; cursor: pointer; }
+.tab.active { border-color: #1890ff; color: #1890ff; }
+.count { margin-left: .25rem; color: #8c8c8c; font-size: .75rem; }
+.toolbar input { border: 1px solid #d9d9d9; border-radius: 8px; padding: .45rem .65rem; min-width: 260px; }
 .message-list { display: grid; gap: .75rem; }
 .message-item {
   width: 100%;

@@ -31,7 +31,7 @@ class MessageController extends Controller
         // Pending items for management/approval roles
         $pendingLeave        = LeaveRequest::where('status', 'PENDING')->count();
         $pendingPetitions    = Petition::where('status', 'PENDING')->count();
-        $pendingReports      = Report::where('status', 'PENDING')->count();
+        $pendingReports      = Report::where('status', 'SUBMITTED')->count();
         $pendingInvoices     = InvoiceRequest::where('status', 'PENDING')->count();
 
         return response()->json([
