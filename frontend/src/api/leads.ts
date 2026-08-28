@@ -6,4 +6,5 @@ export const leadsApi = {
   delete: (id: number) => api.delete(`/leads/${id}`),
   assign: (d: Record<string,unknown>) => api.post('/leads/assign', d),
   import: (file: File) => { const fd = new FormData(); fd.append('file', file); return api.post('/leads/import', fd, { headers: { 'Content-Type': 'multipart/form-data' } }) },
+  importStatus: (jobId: number) => api.get(`/system/import-jobs/${jobId}`),
 }

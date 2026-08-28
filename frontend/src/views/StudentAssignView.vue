@@ -20,11 +20,7 @@
 
     <div v-if="selected.size > 0" class="batch-bar">
       <span>已選 {{ selected.size }} 位學生</span>
-      <select v-model="batchAdvisorId">
-        <option value="">選擇顧問</option>
-        <option v-for="s in staffList" :key="s.id" :value="s.id">{{ s.name }}</option>
-      </select>
-      <button :disabled="!batchAdvisorId" @click="batchAssign">批次指派</button>
+      <button @click="openAssignPopup()">學顧變更</button>
     </div>
 
     <div v-if="loading">載入中...</div>
@@ -47,10 +43,7 @@
           <td>{{ r.status }}</td>
           <td>{{ (r.advisor as any)?.name ?? '-' }}</td>
           <td>
-            <select v-model="advisorMap[r.id as number]">
-              <option value="">未指派</option>
-              <option v-for="s in staffList" :key="s.id" :value="s.id">{{ s.name }}</option>
-            </select>
+            {{ advisorNameById(advisorMap[r.id as number] as number | '') || '未指派' }}
           </td>
           <td>
             <div class="entry-actions">
@@ -61,7 +54,7 @@
             </div>
           </td>
           <td>
-            <button :disabled="!advisorMap[r.id as number]" @click="assignOne(r.id as number)">指派</button>
+            <button @click="openAssignPopup(r.id as number)">學顧變更</button>
           </td>
         </tr>
       </tbody>
@@ -70,6 +63,23 @@
       <button :disabled="page <= 1" @click="page--; load()">上一頁</button>
       <span>第 {{ page }} 頁 / 共 {{ lastPage }} 頁</span>
       <button :disabled="page >= lastPage" @click="page++; load()">下一頁</button>
+    </div>
+
+    <div v-if="assignModalVisible" class="modal-overlay" @click.self="closeAssignPopup">
+      <div class="modal">
+        <h3>C04 學顧變更</h3>
+        <p>目標學生數：{{ assignTargetIds.length }}</p>
+        <label>選擇顧問</label>
+        <select v-model="batchAdvisorId">
+          <option value="">選擇顧問</option>
+          <option v-for="s in staffList" :key="s.id" :value="s.id">{{ s.name }}</option>
+        </select>
+        <p v-if="assignError" class="error">{{ assignError }}</p>
+        <div class="modal-actions">
+          <button :disabled="!batchAdvisorId || assigning" @click="confirmAssign">確認變更</button>
+          <button class="secondary" @click="closeAssignPopup">取消</button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -91,6 +101,10 @@ const selectedArr = ref<number[]>([])
 const selected = computed(() => new Set(selectedArr.value))
 const batchAdvisorId = ref<number|''>('')
 const advisorMap = ref<Record<number, number|''>>({})
+const assignModalVisible = ref(false)
+const assignTargetIds = ref<number[]>([])
+const assignError = ref('')
+const assigning = ref(false)
 const router = useRouter()
 
 async function load() {
@@ -125,19 +139,46 @@ function toggleAll(e: Event) {
   selectedArr.value = checked ? rows.value.map(r => r.id as number) : []
 }
 
-async function assignOne(studentId: number) {
-  const advisorId = advisorMap.value[studentId]
-  if (!advisorId) return
-  await studentsApi.assign({ student_ids: [studentId], advisor_staff_id: advisorId })
-  load()
+function advisorNameById(id: number | '') {
+  if (!id) return ''
+  return staffList.value.find((staff) => staff.id === Number(id))?.name ?? ''
 }
 
-async function batchAssign() {
-  if (!batchAdvisorId.value || selected.value.size === 0) return
-  await studentsApi.assign({ student_ids: [...selected.value], advisor_staff_id: batchAdvisorId.value })
+function openAssignPopup(studentId?: number) {
+  assignError.value = ''
+  if (typeof studentId === 'number') {
+    assignTargetIds.value = [studentId]
+    batchAdvisorId.value = advisorMap.value[studentId] ?? ''
+  } else {
+    assignTargetIds.value = [...selected.value]
+    batchAdvisorId.value = ''
+  }
+  if (assignTargetIds.value.length === 0) {
+    assignError.value = '請先選取至少一位學生'
+    return
+  }
+  assignModalVisible.value = true
+}
+
+function closeAssignPopup() {
+  assignModalVisible.value = false
+  assigning.value = false
+  assignError.value = ''
+}
+
+async function confirmAssign() {
+  if (!batchAdvisorId.value) {
+    assignError.value = '請先選擇顧問'
+    return
+  }
+  assigning.value = true
+  await studentsApi.assign({ student_ids: assignTargetIds.value, advisor_staff_id: batchAdvisorId.value })
+  assignTargetIds.value.forEach((studentId) => {
+    advisorMap.value[studentId] = batchAdvisorId.value
+  })
   selectedArr.value = []
-  batchAdvisorId.value = ''
-  load()
+  closeAssignPopup()
+  await load()
 }
 function goPayments(studentId: number) { router.push({ name: 'payments', query: { student_id: String(studentId) } }) }
 function goServices(studentId: number) { router.push({ name: 'student-services', query: { student_id: String(studentId) } }) }
@@ -169,4 +210,9 @@ button.secondary { background:#13c2c2 }
 button:disabled { opacity:.5;cursor:not-allowed }
 .pagination { display:flex;align-items:center;gap:1rem;margin-top:1rem }
 .entry-actions { display:flex; gap:.25rem; flex-wrap:wrap }
+.modal-overlay { position:fixed; inset:0; background:#0005; display:flex; align-items:center; justify-content:center; z-index:100 }
+.modal { background:#fff; padding:1.25rem; border-radius:8px; min-width:320px; max-width:420px; width:100% }
+.modal select { width:100%; padding:.4rem .6rem; border:1px solid #d9d9d9; border-radius:4px; margin:.5rem 0 }
+.modal-actions { display:flex; gap:.5rem; margin-top:1rem }
+.error { color:#cf1322; margin-top:.5rem }
 </style>

@@ -131,7 +131,15 @@ function reportTypeLabel(value: string): string {
   return value === 'WEEKLY' ? '週報' : '日報'
 }
 function view(id: number) {
-  router.push(`/me/reports?id=${id}`)
+  const report = rows.value.find((row) => Number(row.id) === id) ?? {}
+  const reportType = String((report as { report_type?: string }).report_type ?? 'DAILY')
+  const role = String((report as { staff?: { user?: { role?: string } } }).staff?.user?.role ?? 'staff')
+  const isAdvisor = role === 'staff'
+  const routeName =
+    reportType === 'WEEKLY'
+      ? (isAdvisor ? 'd032' : 'd033')
+      : (isAdvisor ? 'd030' : 'd031')
+  router.push({ name: routeName, params: { id: String(id) } })
 }
 onMounted(load)
 </script>

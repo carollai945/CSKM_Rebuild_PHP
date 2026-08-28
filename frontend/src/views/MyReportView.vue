@@ -8,10 +8,10 @@
         <button @click="load">搜尋</button>
       </div>
       <div class="actions">
-        <button @click="openCreate('DAILY')">學顧日報</button>
-        <button @click="openCreate('DAILY')">行政日報</button>
-        <button @click="openCreate('WEEKLY')">學顧週報</button>
-        <button @click="openCreate('WEEKLY')">行政週報</button>
+        <button @click="openCreate('DAILY', 'advisor')">學顧日報</button>
+        <button @click="openCreate('DAILY', 'admin')">行政日報</button>
+        <button @click="openCreate('WEEKLY', 'advisor')">學顧週報</button>
+        <button @click="openCreate('WEEKLY', 'admin')">行政週報</button>
       </div>
     </div>
 
@@ -23,10 +23,10 @@
         <tbody>
           <tr v-for="r in dailyRows" :key="`daily-${r.id}`">
             <td>{{ r.report_date }}</td>
-            <td>{{ reportStatusLabel(r.status as string) }}</td>
+            <td>{{ reportStatusLabel(String(r.status ?? '')) }}</td>
             <td>{{ (r.content as string) || '-' }}</td>
             <td>
-              <button @click="view(r.id as number)">{{ r.status === 'DRAFT' ? '修改' : '檢視' }}</button>
+              <button @click="goDetail(r, r.status === 'DRAFT')">{{ r.status === 'DRAFT' ? '修改' : '檢視' }}</button>
               <button v-if="r.status==='DRAFT'" @click="submit(r.id as number)">送審</button>
             </td>
           </tr>
@@ -40,10 +40,10 @@
         <tbody>
           <tr v-for="r in weeklyRows" :key="`weekly-${r.id}`">
             <td>{{ r.report_date }}</td>
-            <td>{{ reportStatusLabel(r.status as string) }}</td>
+            <td>{{ reportStatusLabel(String(r.status ?? '')) }}</td>
             <td>{{ (r.content as string) || '-' }}</td>
             <td>
-              <button @click="view(r.id as number)">{{ r.status === 'DRAFT' ? '修改' : '檢視' }}</button>
+              <button @click="goDetail(r, r.status === 'DRAFT')">{{ r.status === 'DRAFT' ? '修改' : '檢視' }}</button>
               <button v-if="r.status==='DRAFT'" @click="submit(r.id as number)">送審</button>
             </td>
           </tr>
@@ -51,79 +51,64 @@
         </tbody>
       </table>
     </template>
-
-    <div v-if="showForm" class="modal-overlay" @click.self="showForm=false">
-      <div class="modal"><h3>A02 個人報表</h3>
-        <div><label>類型</label><select v-model="form.report_type"><option value="DAILY">{{ reportTypeLabel('DAILY') }}</option><option value="WEEKLY">{{ reportTypeLabel('WEEKLY') }}</option></select></div>
-        <div><label>日期</label><input type="date" v-model="form.report_date"/></div>
-        <div><label>內容</label><textarea v-model="form.content" rows="4"/></div>
-        <div class="modal-actions"><button @click="save">儲存</button><button @click="showForm=false">取消</button></div>
-      </div>
-    </div>
-    <div v-if="showDetail" class="modal-overlay" @click.self="showDetail=false">
-      <div class="modal">
-        <h3>報表內容</h3>
-        <div><label>日期</label><div>{{detail.report_date}}</div></div>
-        <div><label>類型</label><div>{{reportTypeLabel(detail.report_type as string)}}</div></div>
-        <div><label>狀態</label><div>{{reportStatusLabel(detail.status as string)}}</div></div>
-        <div><label>內容</label><pre class="content">{{detail.content || '-'}}</pre></div>
-        <div class="modal-actions"><button @click="showDetail=false">關閉</button></div>
-      </div>
-    </div>
   </div>
 </template>
 <script setup lang="ts">
 // 功能編號：A02 個人報表
 import { computed, ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
 import { reportsApi } from '@/api/reports'
+import { useRouter } from 'vue-router'
+
+type StaffKind = 'advisor' | 'admin'
+
 const rows = ref<Record<string,unknown>[]>([])
-const loading = ref(false); const showForm = ref(false)
-const form = ref<Record<string,unknown>>({ report_type:'DAILY', report_date:'', content:'' })
-const showDetail = ref(false)
-const detail = ref<Record<string,unknown>>({})
+const loading = ref(false)
 const filters = ref({ from: '', to: '' })
-const route = useRoute()
+const router = useRouter()
 const dailyRows = computed(() => rows.value.filter(r => r.report_type === 'DAILY'))
 const weeklyRows = computed(() => rows.value.filter(r => r.report_type === 'WEEKLY'))
 
-function currentLocale(): string {
-  if (typeof window === 'undefined') return 'zh-tw'
-  const fromStorage = window.localStorage.getItem('locale')
-    || window.localStorage.getItem('lang')
-    || window.localStorage.getItem('language')
-  const fromDocument = document.documentElement.lang
-  const locale = String(fromStorage || fromDocument || 'zh-tw').toLowerCase()
-  return locale || 'zh-tw'
-}
-
-function isZhLocale(): boolean {
-  return currentLocale().startsWith('zh')
-}
-
-function reportTypeLabel(value: string): string {
-  const isZh = isZhLocale()
-  const map = {
-    DAILY: isZh ? '日報' : 'Daily',
-    WEEKLY: isZh ? '週報' : 'Weekly',
-  } as const
-  return map[value as keyof typeof map] ?? value
-}
-
 function reportStatusLabel(value: string): string {
-  const isZh = isZhLocale()
   const map = {
-    DRAFT: isZh ? '草稿' : 'Draft',
-    SUBMITTED: isZh ? '已送審' : 'Submitted',
-    APPROVED: isZh ? '已核准' : 'Approved',
-    REJECTED: isZh ? '已退回' : 'Rejected',
+    DRAFT: '草稿',
+    SUBMITTED: '已送審',
+    APPROVED: '已核准',
+    REJECTED: '已退回',
   } as const
   return map[value as keyof typeof map] ?? value
 }
-function openCreate(type: 'DAILY' | 'WEEKLY') {
-  form.value = { report_type:type, report_date:'', content:'' }
-  showForm.value = true
+
+function openCreate(reportType: 'DAILY' | 'WEEKLY', kind: StaffKind) {
+  const routeByKey: Record<string, string> = {
+    'DAILY-advisor': 'a020',
+    'DAILY-admin': 'a021',
+    'WEEKLY-advisor': 'a022',
+    'WEEKLY-admin': 'a023',
+  }
+  router.push({ name: routeByKey[`${reportType}-${kind}`], query: { mode: 'create' } })
 }
+
+function guessKind(row: Record<string, unknown>): StaffKind {
+  const value = String((row as { content?: string }).content ?? '')
+  return value.startsWith('[行政]') ? 'admin' : 'advisor'
+}
+
+function goDetail(row: Record<string, unknown>, editable: boolean) {
+  const kind = guessKind(row)
+  const reportType = String(row.report_type ?? 'DAILY')
+  const routeByKey: Record<string, string> = {
+    'DAILY-advisor': 'a024',
+    'DAILY-admin': 'a025',
+    'WEEKLY-advisor': 'a026',
+    'WEEKLY-admin': 'a027',
+  }
+  router.push({
+    name: routeByKey[`${reportType}-${kind}`],
+    params: { id: String(row.id) },
+    query: { mode: editable ? 'edit' : 'view' },
+  })
+}
+
 async function load() {
   loading.value = true
   const params: Record<string, unknown> = {}
@@ -133,49 +118,23 @@ async function load() {
   rows.value = r.data?.data?.data ?? []
   loading.value = false
 }
-async function save() {
-  const r = await reportsApi.create(form.value)
-  const created = r.data?.data ?? {}
-  form.value = { report_type:'DAILY', report_date:'', content:'' }
-  showForm.value = false
+
+async function submit(id: number) {
+  await reportsApi.submit(id)
   await load()
-  if (created.id) await view(created.id as number)
 }
-async function submit(id: number) { await reportsApi.submit(id); load() }
-async function view(id: number) {
-  const r = await reportsApi.get(id)
-  detail.value = r.data?.data ?? {}
-  showDetail.value = true
-}
-onMounted(async () => {
-  await load()
-  const reportId = route.query.id ? Number(route.query.id) : NaN
-  if (!Number.isNaN(reportId) && reportId > 0) {
-    await view(reportId)
-  }
-})
+
+onMounted(load)
 </script>
 <style scoped>
 .page { padding:1rem }
-.card { background:#fff;padding:1.5rem;border-radius:8px;max-width:600px }
-.form-group { margin-bottom:1rem }
-label { display:block;margin-bottom:.25rem;font-weight:500 }
-input, select, textarea { width:100%;padding:.5rem;border:1px solid #d9d9d9;border-radius:4px;box-sizing:border-box }
-button { padding:.5rem 1.5rem;background:#1890ff;color:#fff;border:none;border-radius:4px;cursor:pointer }
-.info { margin-bottom:.5rem }.info span { color:#666 }
 table { width:100%;border-collapse:collapse;background:#fff }
 th,td { padding:.6rem 1rem;border-bottom:1px solid #f0f0f0;text-align:left }
 th { background:#fafafa;font-weight:600 }
-.page-header { display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem }
+button { padding:.5rem 1rem;background:#1890ff;color:#fff;border:none;border-radius:4px;cursor:pointer }
 .toolbar { display:flex; justify-content:space-between; align-items:flex-end; gap:1rem; margin-bottom:1rem; flex-wrap:wrap }
 .filters { display:flex; gap:.5rem; align-items:flex-end; flex-wrap:wrap }
 .filters label { margin-bottom:0 }
 .actions { display:flex; gap:.5rem; flex-wrap:wrap }
-.modal-overlay { position:fixed;inset:0;background:#0005;display:flex;align-items:center;justify-content:center;z-index:100 }
-.modal { background:#fff;padding:2rem;border-radius:8px;min-width:360px }
-.modal input,.modal select,.modal textarea { display:block;width:100%;margin:.5rem 0;padding:.5rem;border:1px solid #d9d9d9;border-radius:4px }
-.modal-actions { margin-top:1rem;display:flex;gap:.5rem }
-.content { white-space:pre-wrap;background:#fafafa;padding:.5rem;border:1px solid #eee;border-radius:4px }
-button.danger { background:#ff4d4f }
 .empty { text-align:center; color:#999 }
 </style>
