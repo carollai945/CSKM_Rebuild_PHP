@@ -36,6 +36,7 @@
           <th>狀態</th>
           <th>目前顧問</th>
           <th>指派顧問</th>
+          <th>分流</th>
           <th>操作</th>
         </tr>
       </thead>
@@ -50,6 +51,14 @@
               <option value="">未指派</option>
               <option v-for="s in staffList" :key="s.id" :value="s.id">{{ s.name }}</option>
             </select>
+          </td>
+          <td>
+            <div class="entry-actions">
+              <button class="secondary" @click="goPayments(r.id as number)">繳費</button>
+              <button class="secondary" @click="goServices(r.id as number)">服務</button>
+              <button class="secondary" @click="goFeedbacks(r.id as number)">意見</button>
+              <button class="secondary" @click="goDetail(r.id as number)">明細</button>
+            </div>
           </td>
           <td>
             <button :disabled="!advisorMap[r.id as number]" @click="assignOne(r.id as number)">指派</button>
@@ -68,6 +77,7 @@
 <script setup lang="ts">
 // 功能編號：C04 學生分配管理
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { studentsApi } from '@/api/students'
 import { staffApi } from '@/api/staff'
 
@@ -81,6 +91,7 @@ const selectedArr = ref<number[]>([])
 const selected = computed(() => new Set(selectedArr.value))
 const batchAdvisorId = ref<number|''>('')
 const advisorMap = ref<Record<number, number|''>>({})
+const router = useRouter()
 
 async function load() {
   loading.value = true
@@ -128,6 +139,10 @@ async function batchAssign() {
   batchAdvisorId.value = ''
   load()
 }
+function goPayments(studentId: number) { router.push({ name: 'payments', query: { student_id: String(studentId) } }) }
+function goServices(studentId: number) { router.push({ name: 'student-services', query: { student_id: String(studentId) } }) }
+function goFeedbacks(studentId: number) { router.push({ name: 'student-feedbacks', query: { student_id: String(studentId) } }) }
+function goDetail(studentId: number) { router.push({ name: 'student-detail', params: { id: String(studentId) } }) }
 
 onMounted(async () => {
   const r = await staffApi.list()
@@ -150,6 +165,8 @@ th,td { padding:.6rem 1rem;border-bottom:1px solid #f0f0f0;text-align:left }
 th { background:#fafafa;font-weight:600 }
 td select { padding:.25rem .5rem;border:1px solid #d9d9d9;border-radius:4px;width:100% }
 button { padding:.4rem .8rem;border:none;border-radius:4px;cursor:pointer;background:#1890ff;color:#fff }
+button.secondary { background:#13c2c2 }
 button:disabled { opacity:.5;cursor:not-allowed }
 .pagination { display:flex;align-items:center;gap:1rem;margin-top:1rem }
+.entry-actions { display:flex; gap:.25rem; flex-wrap:wrap }
 </style>

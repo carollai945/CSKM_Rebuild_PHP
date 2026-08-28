@@ -26,6 +26,20 @@ class ReportApprovalTest extends TestCase {
         Sanctum::actingAs(User::factory()->create(['role'=>Role::Admin])); $r=$this->makeReport();
         $this->postJson("/api/v1/approvals/reports/{$r->id}/reject")->assertStatus(200)->assertJsonPath('data.status','REJECTED');
     }
+    public function test_management_can_batch_approve_submitted_reports(): void {
+        Sanctum::actingAs(User::factory()->create(['role'=>Role::Admin]));
+        $ids = [$this->makeReport()->id, $this->makeReport()->id];
+        $this->postJson('/api/v1/approvals/reports/batch-approve', ['ids' => $ids])
+            ->assertStatus(200)
+            ->assertJsonPath('data.approved_count', 2);
+    }
+    public function test_management_can_batch_reject_submitted_reports(): void {
+        Sanctum::actingAs(User::factory()->create(['role'=>Role::Admin]));
+        $ids = [$this->makeReport()->id, $this->makeReport()->id];
+        $this->postJson('/api/v1/approvals/reports/batch-reject', ['ids' => $ids, 'reject_reason' => '內容需補充'])
+            ->assertStatus(200)
+            ->assertJsonPath('data.rejected_count', 2);
+    }
     public function test_non_management_cannot(): void {
         Sanctum::actingAs(User::factory()->create(['role'=>Role::Staff])); $r=$this->makeReport();
         $this->postJson("/api/v1/approvals/reports/{$r->id}/approve")->assertStatus(403);

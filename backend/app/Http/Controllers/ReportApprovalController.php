@@ -13,9 +13,17 @@ use Illuminate\Support\Facades\Gate;
  * 對應文件：docs/sdd/d03-report-approval-sdd.md
  */
 class ReportApprovalController extends Controller {
-    public function pending(): JsonResponse {
+    public function pending(Request $request): JsonResponse {
         Gate::authorize('management');
-        return response()->json(['data'=>Report::with('staff')->where('status','SUBMITTED')->latest()->paginate(20)]);
+        $query = Report::with(['staff.user'])
+            ->where('status', 'SUBMITTED')
+            ->when($request->filled('report_type'), fn ($q) => $q->where('report_type', $request->report_type))
+            ->when($request->filled('from'), fn ($q) => $q->whereDate('report_date', '>=', $request->from))
+            ->when($request->filled('to'), fn ($q) => $q->whereDate('report_date', '<=', $request->to))
+            ->when($request->filled('keyword'), fn ($q) => $q->whereHas('staff', fn ($sq) => $sq->where('name', 'like', '%' . $request->keyword . '%')))
+            ->latest('report_date')
+            ->latest('id');
+        return response()->json(['data' => $query->paginate(20)]);
     }
     public function approve(Request $request, Report $report): JsonResponse {
         Gate::authorize('management');
@@ -36,17 +44,39 @@ class ReportApprovalController extends Controller {
     public function batchApprove(Request $request): JsonResponse {
         Gate::authorize('management');
         $request->validate(['ids' => 'required|array', 'ids.*' => 'integer']);
-        $staffId = \App\Models\Staff::where('user_id', $request->user()->id)->value('id');
-        $count = Report::whereIn('id', $request->ids)->where('status', 'PENDING')
-            ->update(['status' => 'APPROVED', 'approved_by' => $staffId]);
+        $ids = Report::whereIn('id', $request->ids)
+            ->where('status', 'SUBMITTED')
+            ->pluck('id')
+            ->all();
+        $count = Report::whereIn('id', $ids)->update(['status' => 'APPROVED']);
+        foreach ($ids as $id) {
+            ApprovalActionLog::create([
+                'related_type' => 'report',
+                'related_id' => $id,
+                'actor_id' => $request->user()->id,
+                'action' => 'APPROVE',
+            ]);
+        }
         return response()->json(['data' => ['approved_count' => $count]]);
     }
 
     public function batchReject(Request $request): JsonResponse {
         Gate::authorize('management');
         $request->validate(['ids' => 'required|array', 'ids.*' => 'integer', 'reject_reason' => 'nullable|string']);
-        $count = Report::whereIn('id', $request->ids)->where('status', 'PENDING')
-            ->update(['status' => 'REJECTED', 'reject_reason' => $request->reject_reason]);
+        $ids = Report::whereIn('id', $request->ids)
+            ->where('status', 'SUBMITTED')
+            ->pluck('id')
+            ->all();
+        $count = Report::whereIn('id', $ids)->update(['status' => 'REJECTED']);
+        foreach ($ids as $id) {
+            ApprovalActionLog::create([
+                'related_type' => 'report',
+                'related_id' => $id,
+                'actor_id' => $request->user()->id,
+                'action' => 'REJECT',
+                'comment' => $request->reject_reason,
+            ]);
+        }
         return response()->json(['data' => ['rejected_count' => $count]]);
     }
 }
