@@ -1,5 +1,9 @@
 # A03 請假申請 SDD
 
+## 對應頁面設計
+
+- `page-design/a03-leave-request-page-design.md`
+
 ## 1. 對應需求
 
 - Story：`A03-1`、`A03-2`

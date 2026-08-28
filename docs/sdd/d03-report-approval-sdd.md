@@ -1,5 +1,9 @@
 # D03 報表審核 SDD
 
+## 對應頁面設計
+
+- `page-design/d03-report-approval-page-design.md`
+
 ## 1. 對應需求
 
 - Story：`D03-1`

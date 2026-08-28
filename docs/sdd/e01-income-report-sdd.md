@@ -1,5 +1,9 @@
 # E01 收入報表 SDD
 
+## 對應頁面設計
+
+- `page-design/e01-income-report-page-design.md`
+
 ## 1. 對應需求
 
 - Story：`E01-1`

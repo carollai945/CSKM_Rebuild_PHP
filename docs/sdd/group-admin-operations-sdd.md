@@ -1,5 +1,16 @@
 # 系統管理與維運 SDD
 
+## 對應頁面設計
+
+- `page-design/f00-area-management-page-design.md`
+- `page-design/f00-region-management-page-design.md`
+- `page-design/f01-department-title-page-design.md`
+- `page-design/f02-permission-management-page-design.md`
+- `page-design/f02-permission-page-design.md`
+- `page-design/f03-backup-page-design.md`
+- `page-design/f04-import-leads-page-design.md`
+- `page-design/f05-staff-overview-page-design.md`
+
 ## 對應 Story
 
 - F00-1、F01-1、F02-1、F02-4、F03-1、F04-1、F05-1

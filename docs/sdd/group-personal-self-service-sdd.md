@@ -1,5 +1,11 @@
 # 個人自助功能 SDD
 
+## 對應頁面設計
+
+- `page-design/a00-personal-data-page-design.md`
+- `page-design/a01-change-password-page-design.md`
+- `page-design/a02-personal-report-page-design.md`
+
 ## 對應 Story
 
 - A00-1、A00-2、A01-1、A02-1

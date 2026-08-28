@@ -1,5 +1,9 @@
 # C05 費用項目設定 SDD
 
+## 對應頁面設計
+
+- `page-design/c05-fee-item-page-design.md`
+
 ## 1. 對應需求
 
 - Story：`C05-1`

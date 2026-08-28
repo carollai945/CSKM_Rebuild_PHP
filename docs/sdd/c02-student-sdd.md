@@ -1,5 +1,9 @@
 # C02 學生管理 SDD
 
+## 對應頁面設計
+
+- `page-design/c02-student-page-design.md`
+
 ## 1. 對應需求
 
 - Story：`C02-1`, `C02-2`, `C02-3`

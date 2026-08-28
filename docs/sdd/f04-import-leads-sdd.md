@@ -1,5 +1,9 @@
 # F04 電訪名單匯入 SDD
 
+## 對應頁面設計
+
+- `page-design/f04-import-leads-page-design.md`
+
 ## 1. 對應需求
 
 - Story：`F04-1`

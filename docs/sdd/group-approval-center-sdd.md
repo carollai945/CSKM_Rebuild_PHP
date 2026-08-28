@@ -1,5 +1,19 @@
 # 申請 / 批核中心 SDD
 
+## 對應頁面設計
+
+- `page-design/a03-leave-request-page-design.md`
+- `page-design/a04-petition-page-design.md`
+- `page-design/a05-invoice-request-page-design.md`
+- `page-design/a06-announcement-page-design.md`
+- `page-design/d00-leave-approval-page-design.md`
+- `page-design/d01-petition-approval-page-design.md`
+- `page-design/d02-announcement-approval-page-design.md`
+- `page-design/d03-report-approval-page-design.md`
+- `page-design/d04-student-feedback-page-design.md`
+- `page-design/e02-invoice-list-page-design.md`
+- `page-design/e03-finance-confirm-page-design.md`
+
 ## 對應 Story
 
 - A03-1、A03-2、A05-1、A06-1、A06-2

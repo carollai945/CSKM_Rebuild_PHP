@@ -1,5 +1,9 @@
 # C04 學員管理 SDD
 
+## 對應頁面設計
+
+- `page-design/c04-student-management-page-design.md`
+
 ## 1. 對應需求
 
 - Story：`C04-1`

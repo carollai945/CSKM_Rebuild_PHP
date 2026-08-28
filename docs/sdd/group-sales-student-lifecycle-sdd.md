@@ -1,5 +1,14 @@
 # 業務招生與學員服務 SDD
 
+## 對應頁面設計
+
+- `page-design/b00-lead-management-page-design.md`
+- `page-design/b01-interview-record-page-design.md`
+- `page-design/b02-student-service-page-design.md`
+- `page-design/b02-student-feedback-page-design.md`
+- `page-design/c04-student-management-page-design.md`
+- `page-design/c046-student-detail-page-design.md`
+
 ## 對應 Story
 
 - B00-1、B01-1、B02-1、C04-1

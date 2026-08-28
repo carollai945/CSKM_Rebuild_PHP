@@ -1,5 +1,9 @@
 # E00 繳費查詢與雙重確認 SDD
 
+## 對應頁面設計
+
+- `page-design/e00-payment-page-design.md`
+
 ## 1. 對應需求
 
 - Story：`E00-1`、`E00-2`

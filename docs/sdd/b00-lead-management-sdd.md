@@ -1,5 +1,9 @@
 # B00 電訪名單管理 SDD
 
+## 對應頁面設計
+
+- `page-design/b00-lead-management-page-design.md`
+
 ## 1. 對應需求
 
 - Story：`B00-1`

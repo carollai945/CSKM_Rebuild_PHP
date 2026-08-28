@@ -1,5 +1,9 @@
 # C00 課程與主資料設定 SDD
 
+## 對應頁面設計
+
+- `page-design/c00-course-setup-page-design.md`
+
 ## 1. 對應需求
 
 - Story：`C00-1`

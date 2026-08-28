@@ -1,5 +1,9 @@
 # A04 簽呈申請 / D01 審核流程 SDD
 
+## 對應頁面設計
+
+- `page-design/a04-petition-page-design.md`
+
 ## 1. 對應需求
 
 - Story：`A04-1`、`A04-2`

@@ -1,5 +1,9 @@
 # C01 師資管理 SDD
 
+## 對應頁面設計
+
+- `page-design/c01-professor-page-design.md`
+
 ## 1. 對應需求
 
 - Story：`C01-1`, `C01-2`

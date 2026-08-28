@@ -1,5 +1,9 @@
 # A05 請款申請 SDD
 
+## 對應頁面設計
+
+- `page-design/a05-invoice-request-page-design.md`
+
 ## 1. 對應需求
 
 - Story：`A05-1`

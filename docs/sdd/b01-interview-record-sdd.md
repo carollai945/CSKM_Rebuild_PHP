@@ -1,5 +1,9 @@
 # B01 電訪紀錄 SDD
 
+## 對應頁面設計
+
+- `page-design/b01-interview-record-page-design.md`
+
 ## 1. 對應需求
 
 - Story：`B01-1`

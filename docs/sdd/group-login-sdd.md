@@ -1,5 +1,9 @@
 # Login / 首頁訊息中心 SDD
 
+## 對應頁面設計
+
+- `page-design/group-login-page-design.md`
+
 ## 1. 對應需求
 
 - Story：`Login-1`、`Login-2`、`Login-3`
